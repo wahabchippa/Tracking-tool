@@ -1,0 +1,1003 @@
+
+import streamlit as st
+import pandas as pd
+import re
+from datetime import datetime, timedelta
+
+# ============================================
+# PAGE CONFIG
+# ============================================
+st.set_page_config(
+    page_title="TID Tracker Pro",
+    page_icon="🔍",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# ============================================
+# ICON MAPPING - Context-Aware Icons
+# ============================================
+FIELD_ICONS = {
+    # Order & ID related
+    "order": "🆔",
+    "fleek id": "🆔",
+    "order num": "🆔",
+    "_order": "🆔",
+    "order number": "🆔",
+    
+    # Tracking & AWB
+    "tracking id": "📍",
+    "trackingid": "📍",
+    "tracking": "📍",
+    "awb": "🎫",
+    "hawb": "🎫",
+    "mawb": "✈️",
+    "planned mawb": "✈️",
+    "apx awb number": "🎫",
+    "kerry awb number": "🎫",
+    "ge awb": "🎫",
+    
+    # Dates
+    "date": "📅",
+    "fleek handover date": "📤",
+    "handover date": "📤",
+    "airport handover date": "🛫",
+    "apx entry date": "📥",
+    "ge entry date": "📥",
+    "kerry entry date": "📥",
+    "ge receiving date": "📥",
+    "entry date": "📥",
+    "receiving date": "📥",
+    
+    # Customer & Contact
+    "customer": "👤",
+    "customer name": "👤",
+    "name": "👤",
+    "contact": "📞",
+    "phone": "📱",
+    "email": "📧",
+    "address": "🏠",
+    
+    # Location
+    "country": "🌍",
+    "city": "🏙️",
+    "zone": "📍",
+    "region": "🗺️",
+    "destination": "🎯",
+    
+    # Shipping & Logistics
+    "courier": "🚚",
+    "3pl": "🚛",
+    "carrier": "🚛",
+    "vendor": "🏢",
+    "vendor name": "🏢",
+    "services": "⚙️",
+    "service": "⚙️",
+    "sea/air": "🚢",
+    "mode": "🔄",
+    
+    # Package Details
+    "boxes": "📦",
+    "box": "📦",
+    "weight": "⚖️",
+    "order net weight": "⚖️",
+    "order weight": "⚖️",
+    "kg": "⚖️",
+    "dimensions": "📐",
+    "size": "📐",
+    
+    # Status
+    "status": "🔔",
+    "qc status": "✅",
+    "delivery status": "🚦",
+    "state": "📊",
+    
+    # Financial
+    "price": "💰",
+    "cost": "💵",
+    "amount": "💳",
+    "value": "💎",
+    "cod": "💵",
+    
+    # Notes & Others
+    "notes": "📝",
+    "remarks": "📝",
+    "comment": "💬",
+    "description": "📄",
+    "ref": "🔗",
+    "reference": "🔗",
+}
+
+def get_icon(field_name):
+    """Get appropriate icon for a field name"""
+    field_lower = field_name.lower().strip()
+    
+    # Direct match
+    if field_lower in FIELD_ICONS:
+        return FIELD_ICONS[field_lower]
+    
+    # Partial match
+    for key, icon in FIELD_ICONS.items():
+        if key in field_lower or field_lower in key:
+            return icon
+    
+    # Default icon based on common patterns
+    if "date" in field_lower or "time" in field_lower:
+        return "📅"
+    if "id" in field_lower or "num" in field_lower or "no" in field_lower:
+        return "🔢"
+    if "name" in field_lower:
+        return "📛"
+    if "track" in field_lower:
+        return "📍"
+    
+    return "📋"  # Default
+
+# ============================================
+# PREMIUM CSS STYLING
+# ============================================
+st.markdown("""
+<style>
+    /* Import Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    /* Root Variables */
+    :root {
+        --bg-primary: #0a0a0f;
+        --bg-secondary: #12121a;
+        --bg-card: rgba(255, 255, 255, 0.03);
+        --border-color: rgba(255, 255, 255, 0.08);
+        --text-primary: #ffffff;
+        --text-secondary: #a0a0b0;
+        --accent-orange: #f59e0b;
+        --accent-blue: #3b82f6;
+        --accent-purple: #8b5cf6;
+        --accent-green: #10b981;
+        --accent-pink: #ec4899;
+        --accent-cyan: #06b6d4;
+    }
+    
+    /* Global Styles */
+    .stApp {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Hide Streamlit Elements */
+    #MainMenu, footer, header {visibility: hidden;}
+    .block-container {padding: 2rem 3rem !important; max-width: 100% !important;}
+    
+    /* Animated Background */
+    .bg-orbs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+    
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.3;
+        animation: float 20s ease-in-out infinite;
+    }
+    
+    .orb-1 {
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, #f59e0b, #ec4899);
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+    
+    .orb-2 {
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        top: 50%;
+        right: -50px;
+        animation-delay: -5s;
+    }
+    
+    .orb-3 {
+        width: 350px;
+        height: 350px;
+        background: linear-gradient(135deg, #10b981, #06b6d4);
+        bottom: -100px;
+        left: 30%;
+        animation-delay: -10s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(50px, 50px) rotate(5deg); }
+        50% { transform: translate(0, 100px) rotate(0deg); }
+        75% { transform: translate(-50px, 50px) rotate(-5deg); }
+    }
+    
+    /* Premium Header */
+    .premium-header {
+        text-align: center;
+        padding: 2rem 0 3rem;
+        position: relative;
+    }
+    
+    .logo-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+        font-size: 3rem;
+        background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow {
+        from { filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.5)); }
+        to { filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.5)); }
+    }
+    
+    .main-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffffff 0%, #a0a0b0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+        margin: 0;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+        font-weight: 400;
+    }
+    
+    /* Search Container */
+    .search-container {
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 900px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    .search-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Glass Card */
+    .glass-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        border-color: rgba(255,255,255,0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 1.2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .stat-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.3rem;
+    }
+    
+    /* Result Card */
+    .result-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        transition: all 0.3s ease;
+    }
+    
+    .result-card:hover {
+        border-color: rgba(255,255,255,0.15);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .order-id {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .lp-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge-ecl { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; }
+    .badge-ge { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
+    .badge-apx { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; }
+    .badge-kerry { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .field-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.02);
+    }
+    
+    .field-icon {
+        font-size: 1.1rem;
+        min-width: 24px;
+        text-align: center;
+    }
+    
+    .field-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .field-label {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.2rem;
+    }
+    
+    .field-value {
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        word-break: break-word;
+    }
+    
+    /* Tab Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.5rem;
+        background: transparent;
+        padding: 0.5rem;
+        border-radius: 12px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        padding: 0.8rem 1.5rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        background: rgba(255,255,255,0.08);
+        color: var(--text-primary);
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(139,92,246,0.2)) !important;
+        border-color: rgba(245,158,11,0.3) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #f59e0b, #ec4899) !important;
+        color: #000 !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3) !important;
+    }
+    
+    /* Input Styling */
+    .stTextArea textarea, .stTextInput input, .stSelectbox select {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 10px !important;
+        color: var(--text-primary) !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    
+    .stTextArea textarea:focus, .stTextInput input:focus {
+        border-color: rgba(245, 158, 11, 0.5) !important;
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.1) !important;
+    }
+    
+    /* Date Input Styling */
+    .stDateInput > div > div > input {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 10px !important;
+        color: var(--text-primary) !important;
+    }
+    
+    /* Dataframe Styling */
+    .stDataFrame {
+        background: rgba(255,255,255,0.02);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+    }
+    
+    .no-results-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    /* Footer */
+    .premium-footer {
+        text-align: center;
+        padding: 2rem;
+        margin-top: 3rem;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+</style>
+
+<!-- Animated Background Orbs -->
+<div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+""", unsafe_allow_html=True)
+
+# ============================================
+# DATA SOURCES CONFIGURATION
+# ============================================
+DATA_SOURCES = {
+    "ECL QC Center": {
+        "sheet_id": "1VGP6HYxb-vf3pTlKCT-WyjZlf3sy_j8BrZnjjSxUVJA",
+        "tab": "Address and Tracking QC Center",
+        "order_col": "Fleek ID",
+        "date_col": "Fleek Handover Date",
+        "partner": "ECL",
+        "badge_class": "badge-ecl"
+    },
+    "ECL Zone": {
+        "sheet_id": "1VGP6HYxb-vf3pTlKCT-WyjZlf3sy_j8BrZnjjSxUVJA",
+        "tab": "Address and Tracking Zone",
+        "order_col": 0,
+        "date_col": "Fleek Handover Date",
+        "partner": "ECL",
+        "badge_class": "badge-ecl"
+    },
+    "GE QC Center": {
+        "sheet_id": "1Bt8od4x1xim2CO0vHcpYPR8eoA7L0XWqNsXqBsl9FBI",
+        "tab": "Address and Tracking - QC Centre",
+        "order_col": "Order Num",
+        "date_col": "Fleek Handover Date",
+        "partner": "GE",
+        "badge_class": "badge-ge"
+    },
+    "GE Zone": {
+        "sheet_id": "1Bt8od4x1xim2CO0vHcpYPR8eoA7L0XWqNsXqBsl9FBI",
+        "tab": "Address and Tracking - Zone",
+        "order_col": 0,
+        "date_col": "Airport Handover Date",
+        "partner": "GE",
+        "badge_class": "badge-ge"
+    },
+    "APX": {
+        "sheet_id": "1WrrM_ewt0IcdG9ysKtXfIiSbSla52tsjq6FXP4rRlDo",
+        "tab": "Address and Tracking",
+        "order_col": "Fleek ID",
+        "date_col": "Fleek Handover Date",
+        "partner": "APX",
+        "badge_class": "badge-apx"
+    },
+    "Kerry": {
+        "sheet_id": "12p1mTHfQKrmbekNK2H9IROyBxPaaBg1C0T6EDSyioko",
+        "tab": "Address and Tracking",
+        "order_col": "_Order",
+        "date_col": "Fleek Handover Date",
+        "partner": "Kerry",
+        "badge_class": "badge-kerry"
+    }
+}
+
+# ============================================
+# DATA LOADING FUNCTIONS
+# ============================================
+@st.cache_data(ttl=300)
+def load_sheet_data(sheet_id, tab_name):
+    """Load data from Google Sheet"""
+    try:
+        url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={tab_name.replace(' ', '%20')}"
+        df = pd.read_csv(url)
+        return df
+    except Exception as e:
+        st.error(f"Error loading {tab_name}: {e}")
+        return pd.DataFrame()
+
+def get_order_column(df, order_col_config):
+    """Get the order column name from config (handles both named and index-based)"""
+    if isinstance(order_col_config, int):
+        return df.columns[order_col_config] if len(df.columns) > order_col_config else None
+    return order_col_config if order_col_config in df.columns else None
+
+def parse_date(date_str):
+    """Parse date string in various formats"""
+    if pd.isna(date_str) or str(date_str).strip() == '':
+        return None
+    
+    date_str = str(date_str).strip()
+    
+    # Try different formats
+    formats = ['%d/%m/%Y', '%d/%m/%y', '%Y-%m-%d', '%d-%m-%Y', '%d-%m-%y']
+    
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt).date()
+        except:
+            continue
+    
+    return None
+
+def parse_orders(input_text):
+    """Parse multiple orders from input (handles newlines, commas, spaces, tabs)"""
+    orders = re.split(r'[\n,\t\s]+', input_text.strip())
+    return [o.strip() for o in orders if o.strip()]
+
+def search_all_sources(orders):
+    """Search for orders across all data sources"""
+    results = []
+    
+    for source_name, config in DATA_SOURCES.items():
+        df = load_sheet_data(config["sheet_id"], config["tab"])
+        if df.empty:
+            continue
+            
+        order_col = get_order_column(df, config["order_col"])
+        if not order_col:
+            continue
+        
+        df[order_col] = df[order_col].astype(str)
+        
+        for order in orders:
+            matches = df[df[order_col].str.contains(order, case=False, na=False)]
+            for _, row in matches.iterrows():
+                results.append({
+                    "source": source_name,
+                    "partner": config["partner"],
+                    "badge_class": config["badge_class"],
+                    "order": row[order_col],
+                    "data": row.to_dict()
+                })
+    
+    return results
+
+def is_valid_value(val):
+    """Check if a value is valid (not N/A, empty, etc.)"""
+    if pd.isna(val):
+        return False
+    val_str = str(val).strip().lower()
+    invalid_values = ['#n/a', 'n/a', 'na', 'not applicable', 'none', '', '-', 'nan']
+    return val_str not in invalid_values
+
+def format_value(val):
+    """Format value for display"""
+    if not is_valid_value(val):
+        return "-"
+    return str(val).strip()
+
+# ============================================
+# HEADER
+# ============================================
+st.markdown("""
+<div class="premium-header">
+    <div class="logo-container">
+        <span class="logo-icon">🔍</span>
+    </div>
+    <h1 class="main-title">TID Tracker Pro</h1>
+    <p class="subtitle">Premium Logistics Tracking Intelligence • ECL • GE • APX • Kerry</p>
+</div>
+""", unsafe_allow_html=True)
+
+# ============================================
+# MAIN TABS
+# ============================================
+tab_search, tab_ecl_qc, tab_ecl_zone, tab_ge_qc, tab_ge_zone, tab_apx, tab_kerry = st.tabs([
+    "🔍 Global Search",
+    "🟠 ECL QC",
+    "🟠 ECL Zone", 
+    "🔵 GE QC",
+    "🔵 GE Zone",
+    "🟣 APX",
+    "🟢 Kerry"
+])
+
+# ============================================
+# GLOBAL SEARCH TAB
+# ============================================
+with tab_search:
+    st.markdown("""
+    <div class="search-container">
+        <div class="search-title">🔍 Search Orders Across All Partners</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([4, 1])
+    
+    with col1:
+        search_input = st.text_area(
+            "Enter Order Numbers",
+            placeholder="Enter one or multiple orders (separated by newlines, commas, or spaces)\n\nExample:\n127552_54\n127553_55, 127554_56",
+            height=120,
+            label_visibility="collapsed"
+        )
+    
+    with col2:
+        st.write("")
+        st.write("")
+        search_btn = st.button("🔍 Search", use_container_width=True, type="primary")
+        show_valid_only = st.checkbox("Valid only", value=True, help="Hide empty/N/A values")
+    
+    if search_btn and search_input:
+        orders = parse_orders(search_input)
+        
+        if orders:
+            with st.spinner("🔍 Searching across all logistics partners..."):
+                results = search_all_sources(orders)
+            
+            if results:
+                st.markdown(f"""
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-value">{len(orders)}</div>
+                        <div class="stat-label">Searched</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value">{len(results)}</div>
+                        <div class="stat-label">Found</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-value">{len(set(r['partner'] for r in results))}</div>
+                        <div class="stat-label">Partners</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-value">{len(set(r['source'] for r in results))}</div>
+                        <div class="stat-label">Sources</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                for result in results:
+                    order_id = result['order']
+                    partner = result['partner']
+                    badge_class = result['badge_class']
+                    data = result['data']
+                    source = result['source']
+                    
+                    # Build fields HTML with icons
+                    fields_html = ""
+                    for key, val in data.items():
+                        if show_valid_only and not is_valid_value(val):
+                            continue
+                        icon = get_icon(key)
+                        formatted_val = format_value(val)
+                        fields_html += f"""
+                        <div class="field-item">
+                            <span class="field-icon">{icon}</span>
+                            <div class="field-content">
+                                <div class="field-label">{key}</div>
+                                <div class="field-value">{formatted_val}</div>
+                            </div>
+                        </div>
+                        """
+                    
+                    st.markdown(f"""
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span class="order-id">🆔 {order_id}</span>
+                            <div>
+                                <span class="lp-badge {badge_class}">{partner}</span>
+                                <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">{source}</span>
+                            </div>
+                        </div>
+                        <div class="result-grid">
+                            {fields_html}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Download results
+                st.markdown("---")
+                results_df = pd.DataFrame([{**{"Source": r["source"], "Partner": r["partner"]}, **r["data"]} for r in results])
+                csv = results_df.to_csv(index=False)
+                st.download_button(
+                    "📥 Download Search Results (CSV)",
+                    csv,
+                    "search_results.csv",
+                    "text/csv",
+                    use_container_width=True
+                )
+            else:
+                st.markdown("""
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <h3>No Results Found</h3>
+                    <p>Try different order numbers or check the spelling</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+# ============================================
+# HELPER FUNCTION FOR DATA TABS
+# ============================================
+def render_data_tab(source_name, config):
+    """Render a data tab with stats, filters, and data table"""
+    
+    df = load_sheet_data(config["sheet_id"], config["tab"])
+    
+    if df.empty:
+        st.warning(f"Unable to load data for {source_name}")
+        return
+    
+    order_col = get_order_column(df, config["order_col"])
+    date_col = config.get("date_col")
+    
+    # Parse dates if date column exists
+    if date_col and date_col in df.columns:
+        df['_parsed_date'] = df[date_col].apply(parse_date)
+    
+    # Stats
+    total_orders = len(df)
+    
+    # Try to find common columns for stats
+    boxes_col = next((c for c in df.columns if 'box' in c.lower()), None)
+    weight_col = next((c for c in df.columns if 'weight' in c.lower()), None)
+    country_col = next((c for c in df.columns if 'country' in c.lower()), None)
+    tracking_col = next((c for c in df.columns if 'tracking' in c.lower()), None)
+    
+    total_boxes = df[boxes_col].sum() if boxes_col and pd.api.types.is_numeric_dtype(df[boxes_col]) else 0
+    total_weight = df[weight_col].sum() if weight_col and pd.api.types.is_numeric_dtype(df[weight_col]) else 0
+    unique_countries = df[country_col].nunique() if country_col else 0
+    with_tracking = df[tracking_col].apply(is_valid_value).sum() if tracking_col else 0
+    
+    st.markdown(f"""
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value">{total_orders:,}</div>
+            <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-value">{int(total_boxes):,}</div>
+            <div class="stat-label">Total Boxes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⚖️</div>
+            <div class="stat-value">{total_weight:,.1f}</div>
+            <div class="stat-label">Total Weight (kg)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🌍</div>
+            <div class="stat-value">{unique_countries}</div>
+            <div class="stat-label">Countries</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📍</div>
+            <div class="stat-value">{with_tracking:,}</div>
+            <div class="stat-label">With Tracking</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Filters
+    col1, col2, col3, col4, col5 = st.columns([2, 1.5, 1.5, 1, 1])
+    
+    with col1:
+        search_filter = st.text_input("🔍 Quick Search", placeholder="Search any field...", key=f"search_{source_name}")
+    
+    with col2:
+        # Date From filter
+        min_date = None
+        if '_parsed_date' in df.columns:
+            valid_dates = df['_parsed_date'].dropna()
+            if len(valid_dates) > 0:
+                min_date = min(valid_dates)
+        
+        date_from = st.date_input(
+            "📅 From Date",
+            value=None,
+            key=f"date_from_{source_name}",
+            help="Filter records from this date"
+        )
+    
+    with col3:
+        # Date To filter
+        date_to = st.date_input(
+            "📅 To Date",
+            value=None,
+            key=f"date_to_{source_name}",
+            help="Filter records until this date"
+        )
+    
+    with col4:
+        valid_only = st.checkbox("Valid Only", value=False, key=f"valid_{source_name}")
+    
+    with col5:
+        if st.button("🔄 Refresh", key=f"refresh_{source_name}"):
+            st.cache_data.clear()
+            st.rerun()
+    
+    # Apply filters
+    filtered_df = df.copy()
+    
+    if search_filter:
+        mask = filtered_df.astype(str).apply(lambda x: x.str.contains(search_filter, case=False, na=False)).any(axis=1)
+        filtered_df = filtered_df[mask]
+    
+    # Apply date filters
+    if date_from and '_parsed_date' in filtered_df.columns:
+        filtered_df = filtered_df[filtered_df['_parsed_date'] >= date_from]
+    
+    if date_to and '_parsed_date' in filtered_df.columns:
+        filtered_df = filtered_df[filtered_df['_parsed_date'] <= date_to]
+    
+    if valid_only and tracking_col:
+        filtered_df = filtered_df[filtered_df[tracking_col].apply(is_valid_value)]
+    
+    # Remove the helper column for display
+    display_df = filtered_df.drop(columns=['_parsed_date'], errors='ignore')
+    
+    # Display data
+    st.markdown(f"**Showing {len(filtered_df):,} of {len(df):,} records**")
+    st.dataframe(display_df, use_container_width=True, height=500)
+    
+    # Downloads
+    col1, col2 = st.columns(2)
+    with col1:
+        csv = display_df.to_csv(index=False)
+        st.download_button(
+            "📥 Download Filtered (CSV)",
+            csv,
+            f"{source_name.lower().replace(' ', '_')}_filtered.csv",
+            "text/csv",
+            use_container_width=True
+        )
+    with col2:
+        csv_all = df.drop(columns=['_parsed_date'], errors='ignore').to_csv(index=False)
+        st.download_button(
+            "📥 Download All (CSV)",
+            csv_all,
+            f"{source_name.lower().replace(' ', '_')}_all.csv",
+            "text/csv",
+            use_container_width=True
+        )
+
+# ============================================
+# DATA TABS
+# ============================================
+with tab_ecl_qc:
+    st.markdown("### 🟠 ECL QC Center")
+    render_data_tab("ECL QC Center", DATA_SOURCES["ECL QC Center"])
+
+with tab_ecl_zone:
+    st.markdown("### 🟠 ECL Zone")
+    render_data_tab("ECL Zone", DATA_SOURCES["ECL Zone"])
+
+with tab_ge_qc:
+    st.markdown("### 🔵 GE QC Center")
+    render_data_tab("GE QC Center", DATA_SOURCES["GE QC Center"])
+
+with tab_ge_zone:
+    st.markdown("### 🔵 GE Zone")
+    render_data_tab("GE Zone", DATA_SOURCES["GE Zone"])
+
+with tab_apx:
+    st.markdown("### 🟣 APX Logistics")
+    render_data_tab("APX", DATA_SOURCES["APX"])
+
+with tab_kerry:
+    st.markdown("### 🟢 Kerry Logistics")
+    render_data_tab("Kerry", DATA_SOURCES["Kerry"])
+
+# ============================================
+# FOOTER
+# ============================================
+st.markdown("""
+<div class="premium-footer">
+    <p>🚀 TID Tracker Pro • Premium Logistics Intelligence</p>
+    <p>ECL • GE • APX • Kerry</p>
+</div>
+""", unsafe_allow_html=True)
