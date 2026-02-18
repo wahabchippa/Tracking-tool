@@ -14,211 +14,36 @@ st.set_page_config(
 )
 
 # =============================================================================
-# PREMIUM CSS STYLING
+# CSS STYLING
 # =============================================================================
 
 st.markdown("""
 <style>
-    /* Main background */
     .stApp {
         background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
     }
     
-    /* Hide default header */
-    header[data-testid="stHeader"] {
-        background: transparent;
-    }
-    
-    /* Sidebar styling */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-        border-right: 1px solid #2d2d44;
     }
     
-    /* Premium Header */
     .premium-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-size: 3.5rem;
+        font-size: 2.8rem;
         font-weight: 800;
         text-align: right;
         padding: 10px 0;
-        letter-spacing: -1px;
     }
     
     .header-subtitle {
         color: #8892b0;
-        font-size: 1rem;
+        font-size: 0.95rem;
         text-align: right;
-        margin-top: -10px;
-        padding-bottom: 20px;
+        margin-top: -5px;
     }
     
-    /* Search container */
-    .search-container {
-        background: linear-gradient(145deg, #1e1e32 0%, #2a2a40 100%);
-        border-radius: 20px;
-        padding: 30px;
-        border: 1px solid #3d3d5c;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        margin: 20px 0;
-    }
-    
-    .search-title {
-        color: #a8b2d1;
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 15px;
-    }
-    
-    /* Stats cards */
-    .stats-container {
-        display: flex;
-        gap: 15px;
-        margin: 25px 0;
-    }
-    
-    .stat-card {
-        background: linear-gradient(145deg, #1e1e32 0%, #252540 100%);
-        border-radius: 16px;
-        padding: 20px 25px;
-        border: 1px solid #3d3d5c;
-        flex: 1;
-        text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
-    }
-    
-    .stat-value {
-        font-size: 2.5rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    .stat-label {
-        color: #8892b0;
-        font-size: 0.85rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-top: 5px;
-    }
-    
-    /* Result cards */
-    .result-card {
-        background: linear-gradient(145deg, #1e1e32 0%, #252540 100%);
-        border-radius: 16px;
-        padding: 25px;
-        margin: 15px 0;
-        border-left: 4px solid #667eea;
-        border-top: 1px solid #3d3d5c;
-        border-right: 1px solid #3d3d5c;
-        border-bottom: 1px solid #3d3d5c;
-    }
-    
-    .result-header {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #3d3d5c;
-    }
-    
-    .partner-badge {
-        padding: 8px 16px;
-        border-radius: 25px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .partner-ecl { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
-    .partner-ge { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
-    .partner-apx { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
-    .partner-kerry { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-    
-    .order-id-display {
-        color: #e6f1ff;
-        font-size: 1.3rem;
-        font-weight: 600;
-    }
-    
-    .source-tag {
-        color: #8892b0;
-        font-size: 0.9rem;
-        margin-left: auto;
-    }
-    
-    /* Field grid */
-    .field-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-    }
-    
-    .field-item {
-        background: rgba(255,255,255,0.03);
-        border-radius: 12px;
-        padding: 15px;
-        border: 1px solid #2d2d44;
-    }
-    
-    .field-label {
-        color: #8892b0;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .field-value {
-        color: #e6f1ff;
-        font-size: 1rem;
-        font-weight: 500;
-        word-break: break-word;
-    }
-    
-    .field-value.empty {
-        color: #4a4a6a;
-        font-style: italic;
-    }
-    
-    /* Data status badge */
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin: 10px 0;
-    }
-    
-    .status-badge.loading {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    }
-    
-    /* Speed badge */
     .speed-badge {
         background: rgba(102, 126, 234, 0.2);
         color: #667eea;
@@ -226,111 +51,167 @@ st.markdown("""
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
     }
     
-    /* Sidebar menu */
-    .sidebar-menu {
-        padding: 10px 0;
+    .status-badge {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        display: inline-block;
     }
     
-    .menu-item {
+    .status-badge.loading {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    /* Result Card */
+    .result-card {
+        background: linear-gradient(145deg, #1e1e32 0%, #252540 100%);
+        border-radius: 16px;
+        padding: 0;
+        margin: 20px 0;
+        border: 1px solid #3d3d5c;
+        overflow: hidden;
+    }
+    
+    .result-header {
+        background: linear-gradient(135deg, #2a2a45 0%, #1e1e32 100%);
+        padding: 18px 25px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 15px 20px;
-        margin: 5px 0;
-        border-radius: 12px;
-        color: #8892b0;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        gap: 15px;
+        border-bottom: 1px solid #3d3d5c;
     }
     
-    .menu-item:hover, .menu-item.active {
+    .partner-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .partner-ecl { background: #f59e0b; color: #000; }
+    .partner-ge { background: #3b82f6; color: #fff; }
+    .partner-apx { background: #8b5cf6; color: #fff; }
+    .partner-kerry { background: #10b981; color: #fff; }
+    
+    .order-number {
+        color: #e6f1ff;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+    
+    .source-name {
+        color: #8892b0;
+        font-size: 0.9rem;
+        margin-left: auto;
+    }
+    
+    /* Clean Table Style */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table tr {
+        border-bottom: 1px solid #2d2d44;
+    }
+    
+    .data-table tr:last-child {
+        border-bottom: none;
+    }
+    
+    .data-table td {
+        padding: 14px 25px;
+        vertical-align: top;
+    }
+    
+    .data-table td:first-child {
+        width: 180px;
+        color: #8892b0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .data-table td:last-child {
+        color: #e6f1ff;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    
+    .highlight-value {
         background: rgba(102, 126, 234, 0.15);
+        padding: 4px 10px;
+        border-radius: 6px;
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .tracking-value {
+        background: rgba(16, 185, 129, 0.15);
+        padding: 4px 10px;
+        border-radius: 6px;
+        color: #10b981;
+        font-family: monospace;
+    }
+    
+    .empty-value {
+        color: #4a4a6a;
+        font-style: italic;
+    }
+    
+    /* Section Headers in Card */
+    .section-header {
+        background: rgba(255,255,255,0.03);
+        padding: 10px 25px;
+        color: #667eea;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    
+    /* Stats Row */
+    .stats-row {
+        display: flex;
+        gap: 20px;
+        margin: 25px 0;
+    }
+    
+    .stat-box {
+        background: linear-gradient(145deg, #1e1e32 0%, #252540 100%);
+        border-radius: 12px;
+        padding: 20px 30px;
+        border: 1px solid #3d3d5c;
+        text-align: center;
+        flex: 1;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
         color: #667eea;
     }
     
-    .menu-icon {
-        font-size: 1.2rem;
+    .stat-label {
+        color: #8892b0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 5px;
     }
     
-    /* Custom input styling */
-    .stTextInput > div > div > input {
-        background: #1a1a2e !important;
-        border: 2px solid #3d3d5c !important;
-        border-radius: 12px !important;
-        color: #e6f1ff !important;
-        padding: 15px 20px !important;
-        font-size: 1rem !important;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: #667eea !important;
-        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3) !important;
-    }
-    
-    /* Button styling */
-    .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 15px 30px !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4) !important;
-    }
-    
-    /* No results message */
+    /* No Results */
     .no-results {
         text-align: center;
         padding: 60px;
         color: #8892b0;
-    }
-    
-    .no-results-icon {
-        font-size: 4rem;
-        margin-bottom: 20px;
-    }
-    
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        background: linear-gradient(145deg, #1e1e32 0%, #252540 100%) !important;
-        border-radius: 12px !important;
-        border: 1px solid #3d3d5c !important;
-    }
-    
-    /* Dataframe styling */
-    .stDataFrame {
-        border-radius: 12px;
-        overflow: hidden;
-    }
-    
-    /* Tabs styling override */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: transparent;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: rgba(255,255,255,0.05);
-        border-radius: 10px;
-        padding: 10px 20px;
-        color: #8892b0;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -372,24 +253,37 @@ DATA_SOURCES = {
     }
 }
 
-COLUMN_ALIASES = {
-    "date": ["date", "fleek handover date", "airport handover date", "handover date"],
-    "order#": ["order#", "order", "fleek id", "_order", "order no", "order no.", "order num", "order_id"],
-    "services": ["services", "service", "partner", "3pl"],
-    "weight_kgs": ["weight_kgs", "weight (kg)", "weight", "order net weight", "net weight"],
-    "box_count": ["box_count", "boxes", "box count", "no of boxes"],
-    "airway_bill": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb"],
-    "courier_service": ["courier_service", "courier", "carrier"],
-    "courier_tracking_ids": ["courier_tracking_ids", "tracking id", "tracking_id", "tracking"],
-    "consignee": ["consignee", "customer name", "customer_name", "customer", "name"],
-    "destination": ["destination", "country", "city"]
-}
+# =============================================================================
+# IMPORTANT FIELDS - IN ORDER!
+# =============================================================================
 
-FIELD_ICONS = {
-    "date": "📅", "order#": "🆔", "services": "⚙️", "weight_kgs": "⚖️",
-    "box_count": "📦", "airway_bill": "🎫", "courier_service": "🚚",
-    "courier_tracking_ids": "📍", "consignee": "👤", "destination": "🎯"
-}
+# These are the ONLY fields we show, in THIS exact order
+DISPLAY_FIELDS = [
+    # Section: Order Info
+    {"section": "Order Information", "fields": [
+        {"key": "order#", "label": "Order Number", "aliases": ["order#", "order", "fleek id", "_order", "order no", "order no.", "order num"], "highlight": True},
+        {"key": "date", "label": "Handover Date", "aliases": ["date", "fleek handover date", "airport handover date", "handover date", "ge entry date"]},
+        {"key": "services", "label": "Service", "aliases": ["services", "service", "partner", "3pl"]},
+        {"key": "qc_status", "label": "QC Status", "aliases": ["qc status", "qc_status", "status"]},
+    ]},
+    # Section: Shipment Details
+    {"section": "Shipment Details", "fields": [
+        {"key": "boxes", "label": "Number of Boxes", "aliases": ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "number of boxes"]},
+        {"key": "weight", "label": "Weight (kg)", "aliases": ["weight_kgs", "weight (kg)", "weight", "order net weight", "net weight", "chargeable weight"]},
+        {"key": "pieces", "label": "Pieces", "aliases": ["n.o of pieces", "pieces", "item count", "items"]},
+    ]},
+    # Section: Tracking
+    {"section": "Tracking & Delivery", "fields": [
+        {"key": "awb", "label": "Airway Bill (AWB)", "aliases": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb"], "highlight": True},
+        {"key": "tracking", "label": "Tracking ID", "aliases": ["courier_tracking_ids", "tracking id", "tracking_id", "tracking", "ge comment / tracking"], "tracking": True},
+        {"key": "courier", "label": "Courier Service", "aliases": ["courier_service", "courier", "carrier"]},
+    ]},
+    # Section: Customer
+    {"section": "Customer & Destination", "fields": [
+        {"key": "consignee", "label": "Customer Name", "aliases": ["consignee", "customer name", "customer_name", "customer", "name"]},
+        {"key": "destination", "label": "Destination", "aliases": ["destination", "country", "city"]},
+    ]},
+]
 
 # =============================================================================
 # DATA LOADING
@@ -435,7 +329,7 @@ def initialize_data():
         st.session_state.total_rows = total
 
 # =============================================================================
-# SEARCH FUNCTIONS
+# SEARCH & DATA FUNCTIONS
 # =============================================================================
 
 def instant_search(order_ids):
@@ -463,169 +357,161 @@ def instant_search(order_ids):
     
     return results
 
-def get_standard_name(col):
-    col_lower = col.lower().strip()
-    for std, aliases in COLUMN_ALIASES.items():
-        if col_lower in aliases:
-            return std
-    return None
-
-def filter_tid_data(data):
-    filtered = {}
-    for col, val in data.items():
-        if col == "_search_col":
-            continue
-        std = get_standard_name(col)
-        if std:
-            filtered[std] = val
-        elif len(filtered) < 15:
-            filtered[col] = val
-    return filtered
-
 def is_valid(val):
     if val is None:
         return False
     s = str(val).lower().strip()
-    return s not in ['', 'nan', 'none', 'n/a', '#n/a', 'na', '-', 'null']
+    return s not in ['', 'nan', 'none', 'n/a', '#n/a', 'na', '-', 'null', 'nat']
+
+def get_field_value(data, aliases):
+    """Get field value by checking all possible aliases"""
+    for key, val in data.items():
+        if key.lower().strip() in [a.lower() for a in aliases]:
+            return val
+    return None
+
+def format_value(val, is_highlight=False, is_tracking=False):
+    """Format value with appropriate styling"""
+    if not is_valid(val):
+        return '<span class="empty-value">—</span>'
+    
+    val_str = str(val)
+    
+    if is_highlight:
+        return f'<span class="highlight-value">{val_str}</span>'
+    elif is_tracking:
+        return f'<span class="tracking-value">{val_str}</span>'
+    else:
+        return val_str
 
 # =============================================================================
 # UI COMPONENTS
 # =============================================================================
 
-def render_header():
-    """Render premium header"""
-    col1, col2 = st.columns([2, 1])
-    
-    with col2:
-        st.markdown('<div class="premium-header">TID Search</div>', unsafe_allow_html=True)
-        st.markdown('<div class="header-subtitle">Logistics Tracking Intelligence Dashboard</div>', unsafe_allow_html=True)
-
-def render_stats(results, order_count, search_time):
-    """Render stats cards"""
-    partners = list(set(r["partner"] for r in results))
-    sources = list(set(r["source"] for r in results))
-    
-    st.markdown(f"""
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-value">{len(results)}</div>
-            <div class="stat-label">Results Found</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{order_count}</div>
-            <div class="stat-label">Orders Searched</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{len(partners)}</div>
-            <div class="stat-label">Partners Matched</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{len(sources)}</div>
-            <div class="stat-label">Sources Found</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-def render_result_card(result, valid_only):
-    """Render a beautiful result card"""
+def render_result_card(result):
+    """Render a clean, organized result card"""
     partner = result["partner"]
-    data = filter_tid_data(result["data"])
+    data = result["data"]
     partner_class = f"partner-{partner.lower()}"
     
-    fields = [(k, v) for k, v in data.items() if not valid_only or is_valid(v)]
+    # Build table rows by section
+    table_html = ""
     
-    # Build fields HTML
-    fields_html = ""
-    for name, val in fields[:12]:  # Limit to 12 fields
-        icon = FIELD_ICONS.get(name, "📌")
-        val_display = str(val)[:40] if is_valid(val) else "—"
-        val_class = "" if is_valid(val) else "empty"
-        fields_html += f"""
-        <div class="field-item">
-            <div class="field-label">{icon} {name}</div>
-            <div class="field-value {val_class}">{val_display}</div>
-        </div>
-        """
+    for section in DISPLAY_FIELDS:
+        # Section header
+        table_html += f'<tr><td colspan="2" class="section-header">{section["section"]}</td></tr>'
+        
+        # Fields in this section
+        for field in section["fields"]:
+            value = get_field_value(data, field["aliases"])
+            formatted = format_value(
+                value, 
+                is_highlight=field.get("highlight", False),
+                is_tracking=field.get("tracking", False)
+            )
+            table_html += f'''
+            <tr>
+                <td>{field["label"]}</td>
+                <td>{formatted}</td>
+            </tr>
+            '''
     
+    # Complete card HTML
     st.markdown(f"""
     <div class="result-card">
         <div class="result-header">
             <span class="partner-badge {partner_class}">{partner}</span>
-            <span class="order-id-display">{result['order_id']}</span>
-            <span class="source-tag">📍 {result['source']}</span>
+            <span class="order-number">{result['order_id']}</span>
+            <span class="source-name">📍 {result['source']}</span>
         </div>
-        <div class="field-grid">
-            {fields_html}
+        <table class="data-table">
+            {table_html}
+        </table>
+    </div>
+    """, unsafe_allow_html=True)
+
+def render_stats(results, order_count, search_time):
+    """Render stats row"""
+    partners = list(set(r["partner"] for r in results))
+    
+    st.markdown(f"""
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="stat-number">{len(results)}</div>
+            <div class="stat-label">Results Found</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{order_count}</div>
+            <div class="stat-label">Orders Searched</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{len(partners)}</div>
+            <div class="stat-label">Partners</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{search_time:.0f}ms</div>
+            <div class="stat-label">Search Time</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 def render_sidebar():
-    """Render sidebar navigation"""
+    """Sidebar navigation"""
     with st.sidebar:
         st.markdown("### 🚀 Navigation")
         
-        # Menu items using radio
         page = st.radio(
-            "Select View",
-            ["🔍 Global Search", "🟠 ECL QC Center", "🟠 ECL Zone", 
-             "🔵 GE QC Center", "🔵 GE Zone", "🟣 APX", "🟢 Kerry"],
+            "View",
+            ["🔍 Global Search", "🟠 ECL QC", "🟠 ECL Zone", 
+             "🔵 GE QC", "🔵 GE Zone", "🟣 APX", "🟢 Kerry"],
             label_visibility="collapsed"
         )
         
         st.markdown("---")
         
-        # Data status
         if st.session_state.get("data_loaded"):
             sources_ok = sum(1 for d in st.session_state.all_data.values() if not d["df"].empty)
-            st.markdown(f"""
-            <div class="status-badge">
-                ✅ {st.session_state.total_rows:,} rows loaded
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<div class="status-badge">✅ {st.session_state.total_rows:,} rows</div>', unsafe_allow_html=True)
             st.caption(f"{sources_ok}/6 sources active")
         
         st.markdown("---")
         
-        # Refresh button
         if st.button("🔄 Reload Data", use_container_width=True):
             if "data_loaded" in st.session_state:
                 del st.session_state.data_loaded
             st.rerun()
         
-        # Errors
         if st.session_state.get("load_errors"):
             with st.expander("⚠️ Warnings"):
                 for err in st.session_state.load_errors:
-                    st.warning(err, icon="⚠️")
+                    st.warning(err)
         
         return page
 
 def search_page():
     """Main search page"""
-    render_header()
+    # Header - Right aligned
+    col1, col2 = st.columns([1, 1])
+    with col2:
+        st.markdown('<div class="premium-header">TID Search</div>', unsafe_allow_html=True)
+        st.markdown('<div class="header-subtitle">Logistics Tracking Intelligence</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Search container
-    st.markdown('<div class="search-title">🔍 Search Orders</div>', unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([5, 1, 1])
+    # Search bar
+    col1, col2 = st.columns([5, 1])
     
     with col1:
         search_input = st.text_input(
-            "Enter Order IDs",
-            placeholder="Enter order IDs separated by comma, space or newline...",
+            "🔍 Search Orders",
+            placeholder="Enter order ID (e.g., 122129_34)",
             label_visibility="collapsed"
         )
     
     with col2:
-        search_btn = st.button("🔍 Search", use_container_width=True, type="primary")
+        st.button("Search", use_container_width=True, type="primary")
     
-    with col3:
-        valid_only = st.checkbox("Valid only", value=False)
-    
-    # Process search
+    # Search on input
     if search_input:
         import re
         order_ids = [x.strip() for x in re.split(r'[\n,\t\s]+', search_input) if x.strip()]
@@ -635,25 +521,18 @@ def search_page():
             results = instant_search(order_ids)
             search_time = (time.time() - start) * 1000
             
-            # Speed badge
-            st.markdown(f"""
-            <div class="speed-badge">⚡ Search completed in {search_time:.1f}ms</div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<span class="speed-badge">⚡ {search_time:.1f}ms</span>', unsafe_allow_html=True)
             
             if results:
                 render_stats(results, len(order_ids), search_time)
                 
-                st.markdown("---")
-                st.markdown(f"### 📋 Results ({len(results)})")
-                
                 for result in results:
-                    render_result_card(result, valid_only)
+                    render_result_card(result)
             else:
                 st.markdown("""
                 <div class="no-results">
-                    <div class="no-results-icon">🔍</div>
-                    <h3>No Results Found</h3>
-                    <p>Try a different order ID or check the format</p>
+                    <h2>🔍 No Results Found</h2>
+                    <p>Try a different order ID</p>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -662,25 +541,22 @@ def data_page(source_name):
     config = DATA_SOURCES[source_name]
     
     st.markdown(f"## {source_name}")
-    st.caption(f"Partner: {config['partner']}")
     
     source_data = st.session_state.all_data.get(source_name, {})
     df = source_data.get("df", pd.DataFrame())
     
     if df.empty:
-        st.error("No data available")
+        st.error("No data")
         return
     
-    # Stats
     col1, col2, col3 = st.columns(3)
-    col1.metric("📦 Total Rows", f"{len(df):,}")
+    col1.metric("📦 Rows", f"{len(df):,}")
     col2.metric("📊 Columns", len(df.columns))
-    col3.metric("📁 Partner", config["partner"])
+    col3.metric("Partner", config["partner"])
     
     st.markdown("---")
     
-    # Filter
-    filter_text = st.text_input("🔍 Filter data...", key=f"filter_{source_name}")
+    filter_text = st.text_input("🔍 Filter", key=f"f_{source_name}")
     
     display_df = df.drop(columns=["_search_col"], errors="ignore")
     
@@ -692,49 +568,36 @@ def data_page(source_name):
     
     st.dataframe(display_df, use_container_width=True, height=500)
     
-    st.download_button(
-        "📥 Download CSV",
-        display_df.to_csv(index=False),
-        f"{source_name}.csv",
-        "text/csv"
-    )
+    st.download_button("📥 Download", display_df.to_csv(index=False), f"{source_name}.csv", "text/csv")
 
 # =============================================================================
 # MAIN
 # =============================================================================
 
 def main():
-    # Initialize data with loading screen
     if "data_loaded" not in st.session_state:
         st.markdown("""
         <div style="text-align: center; padding: 100px;">
             <div class="premium-header">TID Search</div>
-            <div class="status-badge loading">🔄 Loading all data sources...</div>
-            <p style="color: #8892b0; margin-top: 20px;">This may take a moment on first load</p>
+            <div class="status-badge loading">🔄 Loading data...</div>
         </div>
         """, unsafe_allow_html=True)
-        
         initialize_data()
         st.rerun()
     
-    # Sidebar navigation
     page = render_sidebar()
     
-    # Route to correct page
-    if page == "🔍 Global Search":
-        search_page()
-    elif page == "🟠 ECL QC Center":
-        data_page("ECL QC Center")
-    elif page == "🟠 ECL Zone":
-        data_page("ECL Zone")
-    elif page == "🔵 GE QC Center":
-        data_page("GE QC Center")
-    elif page == "🔵 GE Zone":
-        data_page("GE Zone")
-    elif page == "🟣 APX":
-        data_page("APX")
-    elif page == "🟢 Kerry":
-        data_page("Kerry")
+    page_map = {
+        "🔍 Global Search": lambda: search_page(),
+        "🟠 ECL QC": lambda: data_page("ECL QC Center"),
+        "🟠 ECL Zone": lambda: data_page("ECL Zone"),
+        "🔵 GE QC": lambda: data_page("GE QC Center"),
+        "🔵 GE Zone": lambda: data_page("GE Zone"),
+        "🟣 APX": lambda: data_page("APX"),
+        "🟢 Kerry": lambda: data_page("Kerry"),
+    }
+    
+    page_map.get(page, search_page)()
 
 if __name__ == "__main__":
     main()
