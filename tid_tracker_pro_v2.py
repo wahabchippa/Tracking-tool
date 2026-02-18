@@ -698,27 +698,22 @@ tab_search, tab_ecl_qc, tab_ecl_zone, tab_ge_qc, tab_ge_zone, tab_apx, tab_kerry
 # GLOBAL SEARCH TAB
 # ============================================
 with tab_search:
-    st.markdown("""
-    <div class="search-container">
-        <div class="search-title">🔍 Search Orders Across All Partners</div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Centered search container
+    col_left, col_center, col_right = st.columns([1, 2, 1])
     
-    col1, col2 = st.columns([4, 1])
-    
-    with col1:
+    with col_center:
         search_input = st.text_area(
-            "Enter Order Numbers",
-            placeholder="Enter one or multiple orders (separated by newlines, commas, or spaces)\n\nExample:\n127552_54\n127553_55, 127554_56",
+            "Search",
+            placeholder="🔍 Search Orders Across All Partners\n\nEnter one or multiple orders (separated by newlines, commas, or spaces)",
             height=120,
             label_visibility="collapsed"
         )
-    
-    with col2:
-        st.write("")
-        st.write("")
-        search_btn = st.button("🔍 Search", use_container_width=True, type="primary")
-        show_valid_only = st.checkbox("Valid only", value=True, help="Hide empty/N/A values")
+        
+        col_btn1, col_btn2 = st.columns([3, 1])
+        with col_btn1:
+            search_btn = st.button("🔍 Search", use_container_width=True, type="primary")
+        with col_btn2:
+            show_valid_only = st.checkbox("Valid only", value=True, help="Hide empty/N/A values")
     
     if search_btn and search_input:
         orders = parse_orders(search_input)
@@ -811,7 +806,6 @@ with tab_search:
                     <p>Try different order numbers or check the spelling</p>
                 </div>
                 """, unsafe_allow_html=True)
-
 # ============================================
 # HELPER FUNCTION FOR DATA TABS
 # ============================================
