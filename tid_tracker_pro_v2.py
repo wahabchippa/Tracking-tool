@@ -17,7 +17,7 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 🎨 CLASSY PREMIUM THEME (Updated)
+# 🎨 CLASSY PREMIUM THEME
 # =============================================================================
 
 CUSTOM_CSS = """
@@ -529,10 +529,10 @@ def fetch_source(name, config, timeout=120):
             if isinstance(order_col, int):
                 order_col = df.columns[order_col]
             df["_search_col"] = df[order_col].astype(str).str.lower().str.strip()
-            return {"name": name, "df": df, "order_col": order_col, "config": config, "error": None}
+            return {"name": name, "df": df, "order_col": order_col, "partner": config["partner"], "icon": config["icon"], "type": config["type"], "error": None}
         except Exception as e:
             if attempt == 2:
-                return {"name": name, "df": pd.DataFrame(), "error": str(e)}
+                return {"name": name, "df": pd.DataFrame(), "partner": config["partner"], "icon": config["icon"], "type": config["type"], "error": str(e)}
             time.sleep(1)
 
 def initialize_data():
@@ -542,12 +542,12 @@ def initialize_data():
         futures = {executor.submit(fetch_source, n, c): n for n, c in DATA_SOURCES.items()}
         for future in as_completed(futures):
             res = future.result()
-            if res["error"]:
+            if res.get("error"):
                 errors.append(f"{res['name']}: {res['error']}")
             results[res["name"]] = res
     st.session_state.all_data = results
     st.session_state.load_errors = errors
-    st.session_state.total_rows = sum(len(d["df"]) for d in results.values())
+    st.session_state.total_rows = sum(len(d.get("df", pd.DataFrame())) for d in results.values())
     st.session_state.data_loaded = True
 
 def is_valid(val):
@@ -594,7 +594,9 @@ def instant_search(order_ids):
                 live_status = get_live_status_from_kerry(oid)
                 results.append({
                     "source": name,
-                    "config": DATA_SOURCES[name],
+                    "partner": data.get("partner", "Unknown"),
+                    "icon": data.get("icon", "⚪"),
+                    "type": data.get("type", ""),
                     "order_id": oid,
                     "data": row.to_dict(),
                     "live_status": live_status
@@ -641,8 +643,9 @@ def render_sidebar():
     return page
 
 def render_result_card(result):
-    config = result["config"]
-    partner = config["partner"]
+    partner = result["partner"]
+    icon = result["icon"]
+    source = result["source"]
     data = result["data"]
     live_status = result.get("live_status")
     
@@ -652,10 +655,10 @@ def render_result_card(result):
     st.markdown(f"""
     <div class="result-header result-header-{partner_class}">
         <div class="result-partner">
-            <span class="result-partner-icon">{config['icon']}</span>
+            <span class="result-partner-icon">{icon}</span>
             <div>
                 <div class="result-partner-name">{partner}</div>
-                <div class="result-partner-type">{result['source']}</div>
+                <div class="result-partner-type">{source}</div>
             </div>
         </div>
         <div class="result-order">#{result['order_id']}</div>
@@ -749,8 +752,9 @@ def search_page():
     # Partner Cards (Home State)
     counts = {"ECL": 0, "GE": 0, "APX": 0, "Kerry": 0}
     for name, data in st.session_state.all_data.items():
-        partner = DATA_SOURCES[name]["partner"]
-        counts[partner] += len(data.get("df", pd.DataFrame()))
+        partner = data.get("partner", "")
+        if partner in counts:
+            counts[partner] += len(data.get("df", pd.DataFrame()))
     
     st.markdown(f"""
     <div class="partner-cards">
@@ -789,15 +793,17 @@ def search_page():
     """, unsafe_allow_html=True)
 
 def data_page(source_name):
-    config = DATA_SOURCES[source_name]
     data = st.session_state.all_data.get(source_name, {})
     df = data.get("df", pd.DataFrame())
+    partner = data.get("partner", "Unknown")
+    icon = data.get("icon", "⚪")
+    source_type = data.get("type", "")
     
-    st.markdown(f"## {config['icon']} {source_name}")
-    if config["type"]:
-        st.caption(f"Partner: {config['partner']} | Type: {config['type']}")
+    st.markdown(f"## {icon} {source_name}")
+    if source_type:
+        st.caption(f"Partner: {partner} | Type: {source_type}")
     else:
-        st.caption(f"Partner: {config['partner']}")
+        st.caption(f"Partner: {partner}")
     
     if df.empty:
         st.error("No data available")
@@ -806,7 +812,7 @@ def data_page(source_name):
     col1, col2, col3 = st.columns(3)
     col1.metric("📦 Total Rows", f"{len(df):,}")
     col2.metric("📊 Columns", len(df.columns))
-    col3.metric("🏢 Partner", config["partner"])
+    col3.metric("🏢 Partner", partner)
     
     st.markdown("---")
     
