@@ -238,7 +238,7 @@ DATA_SOURCES = {
 KERRY_STATUS_TAB_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTZyLyZpVJz9sV5eT4Srwo_KZGnYggpRZkm2ILLYPQKSpTKkWfP9G5759h247O4QEflKCzlQauYsLKI/pub?gid=2121564686&single=true&output=csv"
 
 # =============================================================================
-# DISPLAY FIELDS
+# DISPLAY FIELDS - PIECES REMOVED
 # =============================================================================
 
 DISPLAY_FIELDS = {
@@ -251,6 +251,7 @@ DISPLAY_FIELDS = {
     "📦 Shipment Details": [
         {"label": "Boxes", "aliases": ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "no. of boxes"], "type": "normal"},
         {"label": "Weight (kg)", "aliases": ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight", "order's net weight (kg)"], "type": "normal"},
+        # PIECES REMOVED
     ],
     "🚚 Tracking & Delivery": [
         {"label": "AWB", "aliases": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb"], "type": "highlight"},
@@ -330,31 +331,34 @@ def initialize_data():
         )
 
 # =============================================================================
-# KERRY STATUS TAB SE STATUS FETCH
+# KERRY STATUS TAB SE STATUS FETCH - SAFE (NEVER FAILS)
 # =============================================================================
 
 def get_latest_status_from_kerry(order_id):
-    status_data = st.session_state.all_data.get("_kerry_status_tab", {})
-    df = status_data.get("df", pd.DataFrame())
-    
-    if df.empty or "_search_col" not in df.columns:
+    try:
+        status_data = st.session_state.all_data.get("_kerry_status_tab", {})
+        df = status_data.get("df", pd.DataFrame())
+        
+        if df.empty or "_search_col" not in df.columns:
+            return None
+        
+        search_term = str(order_id).lower().strip()
+        matches = df[df["_search_col"] == search_term]
+        
+        if matches.empty:
+            return None
+        
+        if "latest_status" in df.columns:
+            val = matches.iloc[0].get("latest_status")
+            if pd.notna(val) and str(val).strip():
+                return str(val).strip()
+        
         return None
-    
-    search_term = str(order_id).lower().strip()
-    matches = df[df["_search_col"] == search_term]
-    
-    if matches.empty:
-        return None
-    
-    if "latest_status" in df.columns:
-        val = matches.iloc[0].get("latest_status")
-        if pd.notna(val) and str(val).strip():
-            return str(val).strip()
-    
-    return None
+    except:
+        return None  # NEVER FAIL - just return None
 
 # =============================================================================
-# SEARCH FUNCTION - FIXED
+# SEARCH FUNCTION
 # =============================================================================
 
 def instant_search(order_ids):
@@ -373,18 +377,21 @@ def instant_search(order_ids):
             if df.empty or "_search_col" not in df.columns:
                 continue
             
-            # Search
+            # Exact match first
             matches = df[df["_search_col"] == search_term]
             
+            # Fallback to contains search
             if matches.empty:
-                # Try contains search
-                matches = df[df["_search_col"].str.contains(search_term, na=False, regex=False)]
+                try:
+                    matches = df[df["_search_col"].str.contains(search_term, na=False, regex=False)]
+                except:
+                    pass
             
             for _, row in matches.iterrows():
                 config = DATA_SOURCES[source_name]
                 row_data = row.to_dict()
                 
-                # Kerry status tab se status fetch karo
+                # Kerry status tab se status fetch karo - SAFE call
                 live_status = get_latest_status_from_kerry(order_id)
                 if live_status:
                     row_data["_live_status_from_kerry"] = live_status
@@ -442,11 +449,21 @@ def render_result_card(result):
     """, unsafe_allow_html=True)
     
     for section_name, fields in DISPLAY_FIELDS.items():
-        has_values = any(get_field_value(data, f["aliases"]) for f in fields)
-        
-        if section_name == "📡 Live Status" and not has_values:
+        # Live Status section - show even if empty (will show "—")
+        if section_name == "📡 Live Status":
+            st.markdown(f"<div class='section-title'>{section_name}</div>", unsafe_allow_html=True)
+            cols = st.columns(2)
+            for i, field in enumerate(fields):
+                value = get_field_value(data, field["aliases"])
+                with cols[i % 2]:
+                    st.markdown(f"<div class='field-label'>{field['label']}</div>", unsafe_allow_html=True)
+                    if value:
+                        st.markdown(f"<div class='field-value field-value-status'>📡 {value}</div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown("<div class='field-value field-value-empty'>—</div>", unsafe_allow_html=True)
             continue
         
+        # Other sections
         st.markdown(f"<div class='section-title'>{section_name}</div>", unsafe_allow_html=True)
         
         cols = st.columns(2)
@@ -460,8 +477,7 @@ def render_result_card(result):
                         "tracking": "field-value-tracking", 
                         "status": "field-value-status"
                     }.get(field["type"], "")
-                    prefix = "📡 " if field["type"] == "status" else ""
-                    st.markdown(f"<div class='field-value {css_class}'>{prefix}{value}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='field-value {css_class}'>{value}</div>", unsafe_allow_html=True)
                 else:
                     st.markdown("<div class='field-value field-value-empty'>—</div>", unsafe_allow_html=True)
     
