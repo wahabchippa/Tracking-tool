@@ -165,6 +165,14 @@ st.markdown("""
         border: 1px solid rgba(63, 185, 80, 0.3);
     }
     
+    /* ===== LIVE STATUS STYLING ===== */
+    .field-value-status {
+        background: linear-gradient(135deg, rgba(247, 120, 186, 0.15) 0%, rgba(163, 113, 247, 0.1) 100%);
+        color: #f778ba;
+        font-weight: 600;
+        border: 1px solid rgba(247, 120, 186, 0.3);
+    }
+    
     /* ===== METRICS STYLING ===== */
     [data-testid="stMetricValue"] {
         color: #f0f6fc !important;
@@ -330,7 +338,7 @@ DATA_SOURCES = {
 }
 
 # =============================================================================
-# DISPLAY FIELDS CONFIG
+# DISPLAY FIELDS CONFIG - WITH LIVE STATUS ADDED
 # =============================================================================
 
 DISPLAY_FIELDS = {
@@ -353,6 +361,9 @@ DISPLAY_FIELDS = {
     "👤 Customer Info": [
         {"label": "Customer Name", "aliases": ["consignee", "customer name", "customer_name", "customer", "name"], "type": "normal"},
         {"label": "Destination", "aliases": ["destination", "country", "city"], "type": "normal"},
+    ],
+    "📡 Live Status": [
+        {"label": "Live Status", "aliases": ["latest status", "latest_status", "live status", "current status", "status update", "delivery status"], "type": "status"},
     ],
 }
 
@@ -459,6 +470,13 @@ def render_result_card(result):
     """, unsafe_allow_html=True)
     
     for section_name, fields in DISPLAY_FIELDS.items():
+        # Check if any field in this section has a value
+        has_values = any(get_field_value(data, f["aliases"]) for f in fields)
+        
+        # Skip Live Status section if no status available (for non-Kerry sources)
+        if section_name == "📡 Live Status" and not has_values:
+            continue
+        
         st.markdown(f"<div class='section-title'>{section_name}</div>", unsafe_allow_html=True)
         
         cols = st.columns(2)
@@ -475,6 +493,8 @@ def render_result_card(result):
                         st.markdown(f"<div class='field-value field-value-highlight'>{value}</div>", unsafe_allow_html=True)
                     elif field["type"] == "tracking":
                         st.markdown(f"<div class='field-value field-value-tracking'>{value}</div>", unsafe_allow_html=True)
+                    elif field["type"] == "status":
+                        st.markdown(f"<div class='field-value field-value-status'>📡 {value}</div>", unsafe_allow_html=True)
                     else:
                         st.markdown(f"<div class='field-value'>{value}</div>", unsafe_allow_html=True)
                 else:
@@ -596,6 +616,7 @@ def search_page():
         with col4:
             st.markdown("### 🟢 Kerry")
             st.metric("Orders", f"{counts['Kerry']:,}")
+            st.caption("+ Live Status")
         
         st.markdown("---")
         
