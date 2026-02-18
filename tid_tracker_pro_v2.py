@@ -14,128 +14,274 @@ st.set_page_config(
 )
 
 # =============================================================================
-# CSS STYLING
+# PREMIUM THEME - DECENT & PROFESSIONAL
 # =============================================================================
 
 st.markdown("""
 <style>
+    /* ===== MAIN BACKGROUND - Soft Dark Theme ===== */
     .stApp {
-        background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+        background: linear-gradient(160deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
     }
     
+    /* ===== SIDEBAR - Sleek Dark ===== */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+        background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+        border-right: 1px solid #30363d;
     }
     
+    [data-testid="stSidebar"] .stRadio label {
+        color: #c9d1d9 !important;
+    }
+    
+    [data-testid="stSidebar"] .stRadio label:hover {
+        color: #58a6ff !important;
+    }
+    
+    /* ===== HEADER STYLING ===== */
     .premium-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #58a6ff 0%, #a371f7 50%, #f778ba 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 3rem;
+        font-size: 2.8rem;
         font-weight: 800;
+        letter-spacing: -0.5px;
     }
     
     .subtitle {
-        color: #8892b0;
+        color: #8b949e;
         font-size: 1rem;
+        font-weight: 400;
     }
     
+    /* ===== LIVE BADGE ===== */
     .live-badge {
-        background: #10b981;
+        background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
         color: white;
-        padding: 8px 16px;
-        border-radius: 25px;
+        padding: 8px 18px;
+        border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 600;
+        box-shadow: 0 4px 15px rgba(46, 160, 67, 0.3);
     }
     
-    .section-title {
-        color: #667eea;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin: 15px 0 8px 0;
-        padding-bottom: 5px;
-        border-bottom: 1px solid #3d3d5c;
-    }
-    
+    /* ===== CARDS & CONTAINERS ===== */
     .result-header-box {
-        background: linear-gradient(135deg, #1e1e32 0%, #252540 100%);
+        background: linear-gradient(145deg, #21262d 0%, #161b22 100%);
         border-radius: 12px;
-        padding: 15px 20px;
+        padding: 18px 22px;
         margin-bottom: 15px;
+        border: 1px solid #30363d;
         border-left: 4px solid;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
     }
     
-    .result-header-ecl { border-left-color: #f59e0b; }
-    .result-header-ge { border-left-color: #3b82f6; }
-    .result-header-apx { border-left-color: #8b5cf6; }
-    .result-header-kerry { border-left-color: #10b981; }
+    .result-header-box:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        transform: translateY(-2px);
+    }
     
+    .result-header-ecl { border-left-color: #f0883e; }
+    .result-header-ge { border-left-color: #58a6ff; }
+    .result-header-apx { border-left-color: #a371f7; }
+    .result-header-kerry { border-left-color: #3fb950; }
+    
+    /* ===== PARTNER COLORS ===== */
     .partner-name {
         font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.5px;
     }
     
-    .partner-ecl { color: #f59e0b; }
-    .partner-ge { color: #3b82f6; }
-    .partner-apx { color: #8b5cf6; }
-    .partner-kerry { color: #10b981; }
+    .partner-ecl { color: #f0883e; }
+    .partner-ge { color: #58a6ff; }
+    .partner-apx { color: #a371f7; }
+    .partner-kerry { color: #3fb950; }
     
     .source-name {
-        color: #e6f1ff;
-        font-size: 1.1rem;
+        color: #f0f6fc;
+        font-size: 1.15rem;
         font-weight: 600;
-        margin: 5px 0;
+        margin: 6px 0;
     }
     
     .order-id-display {
-        color: #8892b0;
+        color: #8b949e;
         font-size: 0.9rem;
     }
     
+    /* ===== SECTION TITLES ===== */
+    .section-title {
+        color: #58a6ff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 20px 0 12px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #30363d;
+    }
+    
+    /* ===== FIELD STYLING ===== */
     .field-label {
-        color: #8892b0;
-        font-size: 0.8rem;
+        color: #8b949e;
+        font-size: 0.78rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        margin-bottom: 4px;
     }
     
     .field-value {
-        color: #e6f1ff;
-        font-size: 1rem;
+        color: #f0f6fc;
+        font-size: 0.95rem;
         font-weight: 500;
-        background: rgba(255,255,255,0.05);
-        padding: 8px 12px;
+        background: #21262d;
+        padding: 10px 14px;
         border-radius: 8px;
         margin-top: 4px;
+        border: 1px solid #30363d;
     }
     
     .field-value-empty {
-        color: #4a4a6a;
+        color: #484f58;
         font-style: italic;
+        background: #161b22;
     }
     
     .field-value-highlight {
-        background: rgba(102, 126, 234, 0.15);
-        color: #667eea;
+        background: linear-gradient(135deg, rgba(88, 166, 255, 0.15) 0%, rgba(88, 166, 255, 0.05) 100%);
+        color: #58a6ff;
         font-weight: 600;
+        border: 1px solid rgba(88, 166, 255, 0.3);
     }
     
     .field-value-tracking {
-        background: rgba(16, 185, 129, 0.15);
-        color: #10b981;
-        font-family: monospace;
+        background: linear-gradient(135deg, rgba(63, 185, 80, 0.15) 0%, rgba(63, 185, 80, 0.05) 100%);
+        color: #3fb950;
+        font-family: 'SF Mono', 'Consolas', monospace;
+        border: 1px solid rgba(63, 185, 80, 0.3);
+    }
+    
+    /* ===== METRICS STYLING ===== */
+    [data-testid="stMetricValue"] {
+        color: #f0f6fc !important;
+        font-weight: 700 !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: #8b949e !important;
+    }
+    
+    /* ===== INPUT FIELDS ===== */
+    .stTextInput > div > div > input {
+        background: #21262d !important;
+        border: 1px solid #30363d !important;
+        border-radius: 10px !important;
+        color: #f0f6fc !important;
+        padding: 12px 16px !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #58a6ff !important;
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2) !important;
+    }
+    
+    .stTextInput > div > div > input::placeholder {
+        color: #6e7681 !important;
+    }
+    
+    /* ===== BUTTONS ===== */
+    .stButton > button {
+        background: linear-gradient(135deg, #238636 0%, #2ea043 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 12px 24px !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        box-shadow: 0 4px 15px rgba(46, 160, 67, 0.3) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(46, 160, 67, 0.4) !important;
+    }
+    
+    /* ===== SUCCESS/ERROR/INFO MESSAGES ===== */
+    .stSuccess {
+        background: rgba(46, 160, 67, 0.15) !important;
+        border: 1px solid rgba(46, 160, 67, 0.3) !important;
+        color: #3fb950 !important;
+    }
+    
+    .stError {
+        background: rgba(248, 81, 73, 0.15) !important;
+        border: 1px solid rgba(248, 81, 73, 0.3) !important;
+    }
+    
+    .stInfo {
+        background: rgba(88, 166, 255, 0.1) !important;
+        border: 1px solid rgba(88, 166, 255, 0.2) !important;
+    }
+    
+    /* ===== EXPANDER ===== */
+    .streamlit-expanderHeader {
+        background: #21262d !important;
+        border: 1px solid #30363d !important;
+        border-radius: 10px !important;
+        color: #f0f6fc !important;
+    }
+    
+    .streamlit-expanderContent {
+        background: #161b22 !important;
+        border: 1px solid #30363d !important;
+        border-top: none !important;
+    }
+    
+    /* ===== DATAFRAME ===== */
+    .stDataFrame {
+        border: 1px solid #30363d !important;
+        border-radius: 10px !important;
+    }
+    
+    /* ===== CAPTION ===== */
+    .stCaption {
+        color: #8b949e !important;
+    }
+    
+    /* ===== DIVIDER ===== */
+    hr {
+        border-color: #30363d !important;
+    }
+    
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #161b22;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #30363d;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #484f58;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# DATA SOURCES - WITH CLEAR NAMES
+# DATA SOURCES
 # =============================================================================
 
 DATA_SOURCES = {
@@ -293,11 +439,10 @@ def get_partner_counts():
     return counts
 
 # =============================================================================
-# UI COMPONENTS - NATIVE STREAMLIT
+# UI COMPONENTS
 # =============================================================================
 
 def render_result_card(result):
-    """Render result card with CLEAR source identification"""
     partner = result["partner"]
     source_type = result["type"]
     source_name = result["source"]
@@ -305,13 +450,6 @@ def render_result_card(result):
     data = result["data"]
     order_id = result["order_id"]
     
-    # Create display name
-    if source_type:
-        display_name = f"{partner} {source_type}"
-    else:
-        display_name = partner
-    
-    # Header with source info
     st.markdown(f"""
     <div class="result-header-box result-header-{partner.lower()}">
         <div class="partner-name partner-{partner.lower()}">{icon} {partner}</div>
@@ -320,11 +458,9 @@ def render_result_card(result):
     </div>
     """, unsafe_allow_html=True)
     
-    # Data sections using native Streamlit
     for section_name, fields in DISPLAY_FIELDS.items():
         st.markdown(f"<div class='section-title'>{section_name}</div>", unsafe_allow_html=True)
         
-        # 2 columns per row
         cols = st.columns(2)
         
         for i, field in enumerate(fields):
@@ -335,7 +471,6 @@ def render_result_card(result):
                 st.markdown(f"<div class='field-label'>{field['label']}</div>", unsafe_allow_html=True)
                 
                 if value:
-                    # Different styling based on type
                     if field["type"] == "highlight":
                         st.markdown(f"<div class='field-value field-value-highlight'>{value}</div>", unsafe_allow_html=True)
                     elif field["type"] == "tracking":
@@ -378,7 +513,6 @@ def render_sidebar():
         return page
 
 def search_page():
-    # ===== HEADER =====
     col1, col2 = st.columns([3, 1])
     
     with col1:
@@ -391,7 +525,6 @@ def search_page():
     
     st.markdown("---")
     
-    # ===== SEARCH BOX =====
     st.markdown("#### 🔍 Search Orders")
     
     col1, col2 = st.columns([5, 1])
@@ -410,7 +543,6 @@ def search_page():
     
     st.markdown("---")
     
-    # ===== SEARCH RESULTS =====
     if search_input:
         import re
         order_ids = [x.strip() for x in re.split(r'[\n,\t\s]+', search_input) if x.strip()]
@@ -421,11 +553,9 @@ def search_page():
             search_time = (time.time() - start) * 1000
             
             if results:
-                # Get unique sources
                 sources_found = list(set(r["source"] for r in results))
                 partners_found = list(set(r["partner"] for r in results))
                 
-                # Stats
                 col1, col2, col3, col4 = st.columns(4)
                 col1.metric("Results", len(results))
                 col2.metric("Orders", len(order_ids))
@@ -433,13 +563,9 @@ def search_page():
                 col4.metric("Speed", f"{search_time:.0f}ms")
                 
                 st.markdown("---")
-                
-                # Show which sources matched
                 st.caption(f"📍 Found in: {', '.join(sources_found)}")
-                
                 st.markdown("")
                 
-                # Results
                 for result in results:
                     render_result_card(result)
             else:
@@ -447,7 +573,6 @@ def search_page():
                 st.info("💡 Check order ID format or try a different ID")
     
     else:
-        # ===== HOME PAGE =====
         st.markdown("#### 📦 Connected Data Sources")
         
         counts = get_partner_counts()
@@ -474,7 +599,6 @@ def search_page():
         
         st.markdown("---")
         
-        # Source breakdown
         st.markdown("#### 📊 Source Breakdown")
         
         col1, col2, col3 = st.columns(3)
@@ -517,7 +641,6 @@ def data_page(source_name):
         st.error("No data available")
         return
     
-    # Stats
     col1, col2, col3 = st.columns(3)
     col1.metric("📦 Total Rows", f"{len(df):,}")
     col2.metric("📊 Columns", len(df.columns))
@@ -525,7 +648,6 @@ def data_page(source_name):
     
     st.markdown("---")
     
-    # Filter
     filter_text = st.text_input("🔍 Filter data...", key=f"filter_{source_name}")
     
     display_df = df.drop(columns=["_search_col"], errors="ignore")
@@ -538,7 +660,6 @@ def data_page(source_name):
     
     st.dataframe(display_df, use_container_width=True, height=500)
     
-    # Download
     st.download_button(
         "📥 Download CSV",
         display_df.to_csv(index=False),
@@ -552,7 +673,6 @@ def data_page(source_name):
 # =============================================================================
 
 def main():
-    # Loading screen
     if "data_loaded" not in st.session_state:
         st.markdown('<p class="premium-header">TID Search</p>', unsafe_allow_html=True)
         
@@ -561,10 +681,8 @@ def main():
         
         st.rerun()
     
-    # Sidebar navigation
     page = render_sidebar()
     
-    # Route pages
     page_map = {
         "🔍 Global Search": search_page,
         "🟠 ECL QC Center": lambda: data_page("ECL QC Center"),
