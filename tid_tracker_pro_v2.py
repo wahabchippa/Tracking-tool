@@ -38,7 +38,6 @@ CUSTOM_CSS = """
     --accent-pink: #ec4899;
     --accent-green: #10b981;
     --accent-orange: #f97316;
-    --accent-cyan: #22d3ee;
 }
 
 .stApp {
@@ -52,7 +51,6 @@ CUSTOM_CSS = """
 #MainMenu, footer, header {visibility: hidden;}
 .stDeployButton {display: none;}
 
-/* Premium Header */
 .premium-header {
     font-family: 'Inter', sans-serif;
     font-size: 2.8rem;
@@ -64,7 +62,6 @@ CUSTOM_CSS = """
     text-align: center;
     margin: 0;
     padding: 10px 0;
-    letter-spacing: -1px;
 }
 
 .header-icon {
@@ -98,30 +95,6 @@ CUSTOM_CSS = """
     50% { transform: translateY(-6px); }
 }
 
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
-    border-right: 1px solid var(--border-color);
-}
-
-section[data-testid="stSidebar"] .stRadio > div > label {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 12px 16px !important;
-    margin: 4px 0;
-    color: var(--text-primary) !important;
-    transition: all 0.3s ease;
-}
-
-section[data-testid="stSidebar"] .stRadio > div > label:hover {
-    background: var(--bg-hover);
-    border-color: var(--accent-blue);
-    transform: translateX(4px);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-}
-
-/* Status Badge */
 .status-badge {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(34, 211, 238, 0.15));
     border: 1px solid rgba(16, 185, 129, 0.3);
@@ -139,7 +112,6 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     color: #a5b4fc;
 }
 
-/* Partner Cards */
 .partner-cards {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -161,9 +133,7 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
 .partner-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: 3px;
     border-radius: 16px 16px 0 0;
 }
@@ -174,35 +144,21 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
 }
 
 .partner-ecl::before { background: linear-gradient(90deg, #f97316, #fb923c); }
-.partner-ecl:hover { border-color: #f97316; box-shadow: 0 8px 30px rgba(249, 115, 22, 0.2); }
+.partner-ecl:hover { border-color: #f97316; }
 
 .partner-ge::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
-.partner-ge:hover { border-color: #6366f1; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.2); }
+.partner-ge:hover { border-color: #6366f1; }
 
 .partner-apx::before { background: linear-gradient(90deg, #a855f7, #c084fc); }
-.partner-apx:hover { border-color: #a855f7; box-shadow: 0 8px 30px rgba(168, 85, 247, 0.2); }
+.partner-apx:hover { border-color: #a855f7; }
 
 .partner-kerry::before { background: linear-gradient(90deg, #10b981, #34d399); }
-.partner-kerry:hover { border-color: #10b981; box-shadow: 0 8px 30px rgba(16, 185, 129, 0.2); }
+.partner-kerry:hover { border-color: #10b981; }
 
-.partner-icon {
-    font-size: 2.5rem;
-    margin-bottom: 12px;
-}
+.partner-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.partner-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.partner-count { font-size: 0.85rem; color: var(--text-secondary); }
 
-.partner-name {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-}
-
-.partner-count {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* Recent Section */
 .recent-section {
     margin-top: 30px;
     padding: 20px;
@@ -211,26 +167,11 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     border-radius: 16px;
 }
 
-.section-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 15px;
-}
+.section-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 15px; }
 
-.empty-state {
-    text-align: center;
-    padding: 30px;
-    color: var(--text-muted);
-}
+.empty-state { text-align: center; padding: 30px; color: var(--text-muted); }
+.empty-state-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
 
-.empty-state-icon {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    opacity: 0.5;
-}
-
-/* Speed Badge */
 .speed-badge {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(34, 211, 238, 0.15));
     border: 1px solid rgba(16, 185, 129, 0.3);
@@ -242,7 +183,6 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     font-family: 'JetBrains Mono', monospace;
 }
 
-/* Result Card */
 .result-header {
     padding: 18px 22px;
     border-radius: 14px 14px 0 0;
@@ -257,26 +197,18 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
 .result-header-apx { background: linear-gradient(135deg, #a855f7, #c084fc); }
 .result-header-kerry { background: linear-gradient(135deg, #10b981, #34d399); }
 
-.result-partner {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: white;
-}
-
+.result-partner { display: flex; align-items: center; gap: 12px; color: white; }
 .result-partner-icon { font-size: 1.8rem; }
 .result-partner-name { font-size: 1.2rem; font-weight: 700; }
 .result-partner-type { font-size: 0.8rem; opacity: 0.9; }
 
 .result-order {
     background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
     padding: 8px 16px;
     border-radius: 10px;
     color: white;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    font-size: 0.95rem;
 }
 
 .result-body {
@@ -293,11 +225,7 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     border-bottom: 1px solid var(--border-color);
 }
 
-.result-section:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
+.result-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 
 .result-section-title {
     font-size: 0.8rem;
@@ -308,11 +236,7 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     margin-bottom: 12px;
 }
 
-.field-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
+.field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
 .field-item {
     background: rgba(255,255,255,0.02);
@@ -321,71 +245,36 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     padding: 12px 14px;
 }
 
-.field-label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-}
-
-.field-value {
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    word-break: break-all;
-}
+.field-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+.field-value { color: var(--text-primary); font-size: 0.95rem; word-break: break-all; }
 
 .field-highlight {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
     border-color: rgba(99, 102, 241, 0.2);
 }
-
-.field-highlight .field-value {
-    color: #a5b4fc;
-    font-family: 'JetBrains Mono', monospace;
-}
+.field-highlight .field-value { color: #a5b4fc; font-family: 'JetBrains Mono', monospace; }
 
 .field-tracking {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 211, 238, 0.1));
     border-color: rgba(16, 185, 129, 0.2);
 }
-
-.field-tracking .field-value {
-    color: #6ee7b7;
-    font-family: 'JetBrains Mono', monospace;
-}
+.field-tracking .field-value { color: #6ee7b7; font-family: 'JetBrains Mono', monospace; }
 
 .field-status {
     background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1));
     border-color: rgba(236, 72, 153, 0.2);
 }
+.field-status .field-value { color: #f9a8d4; font-weight: 600; }
 
-.field-status .field-value {
-    color: #f9a8d4;
-    font-weight: 600;
-}
+.no-results { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.no-results h2 { color: var(--text-secondary); margin-bottom: 10px; }
 
-/* No Results */
-.no-results {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-}
-
-.no-results h2 {
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
-
-/* Inputs */
 .stTextInput input {
     background: var(--bg-card) !important;
     border: 2px solid var(--border-color) !important;
     border-radius: 12px !important;
     color: var(--text-primary) !important;
     padding: 12px 16px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    transition: all 0.3s ease !important;
 }
 
 .stTextInput input:focus {
@@ -393,7 +282,6 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.2) !important;
 }
 
-/* Buttons */
 .stButton > button {
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
     border: none !important;
@@ -401,7 +289,6 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     color: white !important;
     font-weight: 600 !important;
     padding: 12px 24px !important;
-    transition: all 0.3s ease !important;
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
 }
 
@@ -410,7 +297,6 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
     box-shadow: 0 6px 25px rgba(168, 85, 247, 0.4) !important;
 }
 
-/* Metrics */
 [data-testid="stMetric"] {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -421,20 +307,19 @@ section[data-testid="stSidebar"] .stRadio > div > label:hover {
 [data-testid="stMetricLabel"] { color: var(--text-secondary) !important; }
 [data-testid="stMetricValue"] { color: var(--text-primary) !important; }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { 
-    background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple)); 
-    border-radius: 3px; 
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #12121a 0%, #0a0a0f 100%) !important;
 }
 
-hr {
-    border: none;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-    margin: 20px 0;
+[data-testid="stSidebar"] > div:first-child {
+    background: transparent !important;
 }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple)); border-radius: 3px; }
+
+hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: 20px 0; }
 </style>
 """
 
@@ -447,45 +332,27 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 DATA_SOURCES = {
     "ECL QC Center": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCiZ1MdPMyVAzBqmBmp3Ch8sfefOp_kfPk2RSfMv3bxRD_qccuwaoM7WTVsieKJbA3y3DF41tUxb3T/pub?gid=0&single=true&output=csv",
-        "order_col": "Fleek ID",
-        "partner": "ECL",
-        "type": "QC Center",
-        "icon": "🟠"
+        "order_col": "Fleek ID", "partner": "ECL", "type": "QC Center", "icon": "🟠"
     },
     "ECL Zone": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCiZ1MdPMyVAzBqmBmp3Ch8sfefOp_kfPk2RSfMv3bxRD_qccuwaoM7WTVsieKJbA3y3DF41tUxb3T/pub?gid=928309568&single=true&output=csv",
-        "order_col": 0,
-        "partner": "ECL",
-        "type": "Zone",
-        "icon": "🟠"
+        "order_col": 0, "partner": "ECL", "type": "Zone", "icon": "🟠"
     },
     "GE QC Center": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjCPd8bUpx59Sit8gMMXjVKhIFA_f-W9Q4mkBSWulOTg4RGahcVXSD4xZiYBAcAH6eO40aEQ9IEEXj/pub?gid=710036753&single=true&output=csv",
-        "order_col": "Order Num",
-        "partner": "GE",
-        "type": "QC Center",
-        "icon": "🔵"
+        "order_col": "Order Num", "partner": "GE", "type": "QC Center", "icon": "🔵"
     },
     "GE Zone": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjCPd8bUpx59Sit8gMMXjVKhIFA_f-W9Q4mkBSWulOTg4RGahcVXSD4xZiYBAcAH6eO40aEQ9IEEXj/pub?gid=10726393&single=true&output=csv",
-        "order_col": 0,
-        "partner": "GE",
-        "type": "Zone",
-        "icon": "🔵"
+        "order_col": 0, "partner": "GE", "type": "Zone", "icon": "🔵"
     },
     "APX": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRDEzAMUwnFZ7aoThGoMERtxxsll2kfEaSpa9ksXIx6sqbdMncts6Go2d5mKKabepbNXDSoeaUlk-mP/pub?gid=0&single=true&output=csv",
-        "order_col": "Fleek ID",
-        "partner": "APX",
-        "type": None,
-        "icon": "🟣"
+        "order_col": "Fleek ID", "partner": "APX", "type": None, "icon": "🟣"
     },
     "Kerry": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTZyLyZpVJz9sV5eT4Srwo_KZGnYggpRZkm2ILLYPQKSpTKkWfP9G5759h247O4QEflKCzlQauYsLKI/pub?gid=0&single=true&output=csv",
-        "order_col": "_Order",
-        "partner": "Kerry",
-        "type": None,
-        "icon": "🟢"
+        "order_col": "_Order", "partner": "Kerry", "type": None, "icon": "🟢"
     }
 }
 
@@ -565,7 +432,6 @@ def get_field_value(data, aliases):
     return None
 
 def get_live_status_from_kerry(order_id):
-    """Fetch live status from Kerry for ANY order"""
     kerry = st.session_state.all_data.get("Kerry", {})
     df = kerry.get("df", pd.DataFrame())
     if df.empty:
@@ -607,51 +473,14 @@ def instant_search(order_ids):
 # UI COMPONENTS
 # =============================================================================
 
-def render_sidebar():
-    with st.sidebar:
-        st.markdown("""
-        <div style="text-align: center; padding: 15px 0;">
-            <div class="header-icon">🔎</div>
-            <div class="premium-header" style="font-size: 1.5rem;">TrackMaster Pro</div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.markdown("---")
-        
-        page = st.radio(
-            "Navigation",
-            ["🔍 Global Search", "🟠 ECL QC", "🟠 ECL Zone", "🔵 GE QC", "🔵 GE Zone", "🟣 APX", "🟢 Kerry"],
-            label_visibility="collapsed"
-        )
-        
-        st.markdown("---")
-        
-        if st.session_state.get("data_loaded"):
-            st.markdown(f'<div class="status-badge">✅ {st.session_state.total_rows:,} rows loaded</div>', unsafe_allow_html=True)
-        
-        st.markdown("---")
-        
-        if st.button("🔄 Reload Data", use_container_width=True):
-            if "data_loaded" in st.session_state:
-                del st.session_state.data_loaded
-            st.rerun()
-        
-        if st.session_state.get("load_errors"):
-            with st.expander("⚠️ Warnings"):
-                for err in st.session_state.load_errors:
-                    st.warning(err)
-    
-    return page
-
 def render_result_card(result):
     partner = result["partner"]
     icon = result["icon"]
     source = result["source"]
     data = result["data"]
     live_status = result.get("live_status")
-    
     partner_class = partner.lower()
     
-    # Header
     st.markdown(f"""
     <div class="result-header result-header-{partner_class}">
         <div class="result-partner">
@@ -665,7 +494,6 @@ def render_result_card(result):
     </div>
     """, unsafe_allow_html=True)
     
-    # Body
     body_html = '<div class="result-body">'
     
     for section_name, fields in DISPLAY_FIELDS.items():
@@ -679,28 +507,16 @@ def render_result_card(result):
             body_html += f'<div class="result-section"><div class="result-section-title">{section_name}</div><div class="field-grid">'
             for name, val, style in section_fields:
                 style_class = f"field-{style}" if style != "normal" else ""
-                body_html += f'''
-                <div class="field-item {style_class}">
-                    <div class="field-label">{name}</div>
-                    <div class="field-value">{val}</div>
-                </div>
-                '''
+                body_html += f'<div class="field-item {style_class}"><div class="field-label">{name}</div><div class="field-value">{val}</div></div>'
             body_html += '</div></div>'
     
-    # Live Status Section (from Kerry for ALL orders)
     if live_status:
         body_html += f'''
         <div class="result-section">
             <div class="result-section-title">📡 Live Status</div>
             <div class="field-grid">
-                <div class="field-item field-status">
-                    <div class="field-label">Latest Status</div>
-                    <div class="field-value">{live_status}</div>
-                </div>
-                <div class="field-item">
-                    <div class="field-label">Source</div>
-                    <div class="field-value">Kerry Logistics</div>
-                </div>
+                <div class="field-item field-status"><div class="field-label">Latest Status</div><div class="field-value">{live_status}</div></div>
+                <div class="field-item"><div class="field-label">Source</div><div class="field-value">Kerry Logistics</div></div>
             </div>
         </div>
         '''
@@ -709,7 +525,6 @@ def render_result_card(result):
     st.markdown(body_html, unsafe_allow_html=True)
 
 def search_page():
-    # Header
     st.markdown("""
     <div style="text-align: center; padding: 20px 0;">
         <div class="header-icon">🔎</div>
@@ -719,14 +534,12 @@ def search_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Search
     col1, col2 = st.columns([5, 1])
     with col1:
-        search_input = st.text_input("🔍 Search", placeholder="Enter order ID (e.g., 122129_34)", label_visibility="collapsed")
+        search_input = st.text_input("Search", placeholder="Enter order ID (e.g., 122129_34)", label_visibility="collapsed")
     with col2:
-        search_btn = st.button("Search", use_container_width=True, type="primary")
+        st.button("Search", use_container_width=True, type="primary")
     
-    # Search Logic
     if search_input:
         import re
         order_ids = [x.strip() for x in re.split(r'[\n,\t\s]+', search_input) if x.strip()]
@@ -741,15 +554,9 @@ def search_page():
                 for result in results:
                     render_result_card(result)
             else:
-                st.markdown("""
-                <div class="no-results">
-                    <h2>🔍 No Results Found</h2>
-                    <p>Try a different order ID</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown('<div class="no-results"><h2>🔍 No Results Found</h2><p>Try a different order ID</p></div>', unsafe_allow_html=True)
             return
     
-    # Partner Cards (Home State)
     counts = {"ECL": 0, "GE": 0, "APX": 0, "Kerry": 0}
     for name, data in st.session_state.all_data.items():
         partner = data.get("partner", "")
@@ -758,37 +565,17 @@ def search_page():
     
     st.markdown(f"""
     <div class="partner-cards">
-        <div class="partner-card partner-ecl">
-            <div class="partner-icon">🟠</div>
-            <div class="partner-name">ECL</div>
-            <div class="partner-count">{counts['ECL']:,} orders</div>
-        </div>
-        <div class="partner-card partner-ge">
-            <div class="partner-icon">🔵</div>
-            <div class="partner-name">GE</div>
-            <div class="partner-count">{counts['GE']:,} orders</div>
-        </div>
-        <div class="partner-card partner-apx">
-            <div class="partner-icon">🟣</div>
-            <div class="partner-name">APX</div>
-            <div class="partner-count">{counts['APX']:,} orders</div>
-        </div>
-        <div class="partner-card partner-kerry">
-            <div class="partner-icon">🟢</div>
-            <div class="partner-name">Kerry</div>
-            <div class="partner-count">{counts['Kerry']:,} orders</div>
-        </div>
+        <div class="partner-card partner-ecl"><div class="partner-icon">🟠</div><div class="partner-name">ECL</div><div class="partner-count">{counts['ECL']:,} orders</div></div>
+        <div class="partner-card partner-ge"><div class="partner-icon">🔵</div><div class="partner-name">GE</div><div class="partner-count">{counts['GE']:,} orders</div></div>
+        <div class="partner-card partner-apx"><div class="partner-icon">🟣</div><div class="partner-name">APX</div><div class="partner-count">{counts['APX']:,} orders</div></div>
+        <div class="partner-card partner-kerry"><div class="partner-icon">🟢</div><div class="partner-name">Kerry</div><div class="partner-count">{counts['Kerry']:,} orders</div></div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Recent Searches
     st.markdown("""
     <div class="recent-section">
         <div class="section-title">🕐 Recent Searches</div>
-        <div class="empty-state">
-            <div class="empty-state-icon">🔍</div>
-            <div>Your recent searches will appear here</div>
-        </div>
+        <div class="empty-state"><div class="empty-state-icon">🔍</div><div>Your recent searches will appear here</div></div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -824,20 +611,14 @@ def data_page(source_name):
         display_df = display_df[mask]
     
     st.dataframe(display_df, use_container_width=True, height=500)
-    
-    st.download_button(
-        "📥 Download CSV",
-        display_df.to_csv(index=False),
-        f"{source_name.replace(' ', '_')}.csv",
-        "text/csv",
-        use_container_width=True
-    )
+    st.download_button("📥 Download CSV", display_df.to_csv(index=False), f"{source_name.replace(' ', '_')}.csv", "text/csv", use_container_width=True)
 
 # =============================================================================
 # MAIN
 # =============================================================================
 
 def main():
+    # Initialize data first if not loaded
     if "data_loaded" not in st.session_state:
         st.markdown("""
         <div style="text-align: center; padding: 100px;">
@@ -850,8 +631,38 @@ def main():
         initialize_data()
         st.rerun()
     
-    page = render_sidebar()
+    # SIDEBAR - Always render
+    with st.sidebar:
+        st.markdown("""
+        <div style="text-align: center; padding: 15px 0;">
+            <div style="font-size: 2.5rem;">🔎</div>
+            <div style="font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TrackMaster Pro</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        page = st.radio(
+            "📍 Navigation",
+            ["🔍 Global Search", "🟠 ECL QC", "🟠 ECL Zone", "🔵 GE QC", "🔵 GE Zone", "🟣 APX", "🟢 Kerry"],
+        )
+        
+        st.markdown("---")
+        
+        st.markdown(f'<div class="status-badge">✅ {st.session_state.total_rows:,} rows</div>', unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        if st.button("🔄 Reload Data", use_container_width=True):
+            del st.session_state.data_loaded
+            st.rerun()
+        
+        if st.session_state.get("load_errors"):
+            with st.expander("⚠️ Warnings"):
+                for err in st.session_state.load_errors:
+                    st.warning(err)
     
+    # MAIN CONTENT
     page_map = {
         "🔍 Global Search": search_page,
         "🟠 ECL QC": lambda: data_page("ECL QC Center"),
