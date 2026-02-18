@@ -411,11 +411,7 @@ def instant_search(order_ids):
                 continue
     
 return results
-    if val is None:
-        return False
-    s = str(val).lower().strip()
-    return s not in ['', 'nan', 'none', 'n/a', '#n/a', 'na', '-', 'null', 'nat', 'not applicable']
-
+    
 def get_field_value(data, aliases):
     for key, val in data.items():
         if key.lower().strip() in [a.lower() for a in aliases]:
