@@ -805,7 +805,7 @@ DATA_SOURCES = {
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 📋 DISPLAY FIELDS CONFIGURATION
+# 📋 DISPLAY FIELDS CONFIGURATION (Pieces removed)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 DISPLAY_FIELDS = {
@@ -818,7 +818,6 @@ DISPLAY_FIELDS = {
     "📦 Shipment Details": [
         {"name": "Boxes", "aliases": ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "no. of boxes"], "style": "normal"},
         {"name": "Weight (kg)", "aliases": ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight", "total weight"], "style": "normal"},
-        {"name": "Pieces", "aliases": ["n.o of pieces", "pieces", "item count", "items", "no of pieces", "no. of pieces"], "style": "normal"},
     ],
     "🚚 Tracking & Delivery": [
         {"name": "AWB", "aliases": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb", "awb number"], "style": "highlight"},
@@ -829,10 +828,9 @@ DISPLAY_FIELDS = {
         {"name": "Customer Name", "aliases": ["consignee", "customer name", "customer_name", "customer", "name", "receiver"], "style": "normal"},
         {"name": "Destination", "aliases": ["destination", "country", "city", "delivery city", "dest"], "style": "normal"},
     ],
-    "📡 Live Status": [
-        {"name": "Latest Status", "aliases": ["latest status", "latest_status", "live status", "current status", "status update", "delivery status"], "style": "status"},
-    ]
 }
+
+# Live Status section is handled separately - fetched from Kerry for all orders
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # ⚙️ DATA LOADING FUNCTIONS
@@ -921,6 +919,35 @@ def parse_order_ids(input_text):
     return [oid.strip() for oid in order_ids if oid.strip()]
 
 
+def get_live_status_from_kerry(order_id):
+    """Fetch live status for any order from Kerry sheet"""
+    kerry_data = st.session_state.all_data.get("🟢 Kerry")
+    
+    if kerry_data is None or kerry_data.get("df") is None:
+        return None
+    
+    df = kerry_data["df"]
+    search_term = order_id.lower().strip()
+    
+    # Search in Kerry sheet
+    matches = df[df["_search_col"] == search_term]
+    
+    if len(matches) > 0:
+        row = matches.iloc[0]
+        # Try multiple possible column names for status
+        status_aliases = ["latest status", "latest_status", "live status", "current status", 
+                         "status update", "delivery status", "status"]
+        
+        for alias in status_aliases:
+            # Check case-insensitive
+            for col in df.columns:
+                if col.lower().strip() == alias.lower():
+                    val = row[col]
+                    if is_valid(val):
+                        return str(val)
+    return None
+
+
 def instant_search(order_ids):
     """Search all loaded data instantly"""
     results = []
@@ -936,13 +963,17 @@ def instant_search(order_ids):
             matches = df[df["_search_col"] == search_term]
             
             for _, row in matches.iterrows():
+                # Get live status from Kerry for ALL orders
+                live_status = get_live_status_from_kerry(order_id)
+                
                 results.append({
                     "source": source_name,
                     "partner": source_data["partner"],
                     "type": source_data["type"],
                     "icon": source_data["icon"],
                     "order_id": order_id,
-                    "data": row.to_dict()
+                    "data": row.to_dict(),
+                    "live_status": live_status  # Add live status from Kerry
                 })
     
     return results
@@ -980,6 +1011,7 @@ def is_valid(val):
 def render_result_card(result):
     """Render a complete result card with premium styling"""
     data = result["data"]
+    live_status = result.get("live_status")  # Get live status from Kerry
     
     # Render premium header
     render_result_card_header(result)
@@ -1016,6 +1048,15 @@ def render_result_card(result):
             for idx, (name, value, style) in enumerate(section_values):
                 with cols[idx % 2]:
                     render_field_value(name, value, style)
+    
+    # Render Live Status section (from Kerry) - for ALL orders
+    if live_status:
+        render_section_header("Live Status", "📡")
+        cols = st.columns(2)
+        with cols[0]:
+            render_field_value("Latest Status", live_status, "status")
+        with cols[1]:
+            render_field_value("Status Source", "Kerry Logistics", "normal")
     
     # Close body and render footer
     st.markdown("</div>", unsafe_allow_html=True)
