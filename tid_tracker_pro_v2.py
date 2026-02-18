@@ -7,8 +7,8 @@ import time
 
 # Page config
 st.set_page_config(
-    page_title="TID Search Tool",
-    page_icon="🔍",
+    page_title="TrackMaster Pro",
+    page_icon="🔎",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -338,7 +338,7 @@ DATA_SOURCES = {
 }
 
 # =============================================================================
-# DISPLAY FIELDS CONFIG - WITH LIVE STATUS ADDED
+# DISPLAY FIELDS CONFIG - PIECES REMOVED, LIVE STATUS ADDED
 # =============================================================================
 
 DISPLAY_FIELDS = {
@@ -351,7 +351,7 @@ DISPLAY_FIELDS = {
     "📦 Shipment Details": [
         {"label": "Boxes", "aliases": ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes"], "type": "normal"},
         {"label": "Weight (kg)", "aliases": ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight"], "type": "normal"},
-        {"label": "Pieces", "aliases": ["n.o of pieces", "pieces", "item count", "items"], "type": "normal"},
+        # REMOVED: Pieces field as requested
     ],
     "🚚 Tracking & Delivery": [
         {"label": "AWB", "aliases": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb"], "type": "highlight"},
@@ -363,7 +363,7 @@ DISPLAY_FIELDS = {
         {"label": "Destination", "aliases": ["destination", "country", "city"], "type": "normal"},
     ],
     "📡 Live Status": [
-        {"label": "Live Status", "aliases": ["latest status", "latest_status", "live status", "current status", "status update", "delivery status"], "type": "status"},
+        {"label": "Live Status", "aliases": ["live_status"], "type": "status"},
     ],
 }
 
@@ -403,6 +403,36 @@ def initialize_data():
         st.session_state.total_rows = sum(len(d["df"]) for d in st.session_state.all_data.values())
 
 # =============================================================================
+# LIVE STATUS FETCH FROM KERRY (FOR ALL ORDERS)
+# =============================================================================
+
+def get_live_status_from_kerry(order_id):
+    """Fetch live status from Kerry sheet for ANY order (cross-partner lookup)"""
+    kerry_data = st.session_state.all_data.get("Kerry", {})
+    df = kerry_data.get("df", pd.DataFrame())
+    
+    if df.empty or "_search_col" not in df.columns:
+        return None
+    
+    search_term = order_id.lower().strip()
+    matches = df[df["_search_col"] == search_term]
+    
+    if matches.empty:
+        return None
+    
+    # Get the first match and look for status columns
+    row = matches.iloc[0]
+    status_aliases = ["latest status", "latest_status", "live status", "current status", "status update", "delivery status", "status"]
+    
+    for col in df.columns:
+        if col.lower().strip() in status_aliases:
+            val = row.get(col)
+            if pd.notna(val) and str(val).strip() and str(val).lower() not in ['nan', 'none', 'n/a', '-']:
+                return str(val).strip()
+    
+    return None
+
+# =============================================================================
 # SEARCH FUNCTIONS
 # =============================================================================
 
@@ -419,13 +449,20 @@ def instant_search(order_ids):
             matches = df[df["_search_col"] == search_term]
             for _, row in matches.iterrows():
                 config = DATA_SOURCES[source_name]
+                row_data = row.to_dict()
+                
+                # CHANGE: Fetch live status from Kerry for ALL orders (not just Kerry)
+                live_status = get_live_status_from_kerry(order_id)
+                if live_status:
+                    row_data["live_status"] = live_status
+                
                 results.append({
                     "source": source_name,
                     "partner": config["partner"],
                     "type": config["type"],
                     "icon": config["icon"],
                     "order_id": order_id,
-                    "data": row.to_dict()
+                    "data": row_data
                 })
     return results
 
@@ -473,7 +510,7 @@ def render_result_card(result):
         # Check if any field in this section has a value
         has_values = any(get_field_value(data, f["aliases"]) for f in fields)
         
-        # Skip Live Status section if no status available (for non-Kerry sources)
+        # Skip Live Status section if no status available
         if section_name == "📡 Live Status" and not has_values:
             continue
         
@@ -536,7 +573,8 @@ def search_page():
     col1, col2 = st.columns([3, 1])
     
     with col1:
-        st.markdown('<p class="premium-header">TID Search</p>', unsafe_allow_html=True)
+        # CHANGE: Updated heading to TrackMaster Pro with 🔎 icon
+        st.markdown('<p class="premium-header">🔎 TrackMaster Pro</p>', unsafe_allow_html=True)
         st.markdown('<p class="subtitle">Logistics Tracking Intelligence Dashboard</p>', unsafe_allow_html=True)
     
     with col2:
@@ -695,7 +733,8 @@ def data_page(source_name):
 
 def main():
     if "data_loaded" not in st.session_state:
-        st.markdown('<p class="premium-header">TID Search</p>', unsafe_allow_html=True)
+        # CHANGE: Updated loading screen heading
+        st.markdown('<p class="premium-header">🔎 TrackMaster Pro</p>', unsafe_allow_html=True)
         
         with st.spinner("🔄 Loading all data sources..."):
             initialize_data()
