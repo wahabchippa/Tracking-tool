@@ -374,8 +374,15 @@ def instant_search(order_ids):
                 continue
             
             df = source_data.get("df", pd.DataFrame())
-            if df.empty or "_search_col" not in df.columns:
+            order_col = source_data.get("order_col")
+            
+            if df.empty or order_col is None:
                 continue
+            
+            # Create search column if not exists
+            if "_search_col" not in df.columns:
+                df["_search_col"] = df[order_col].astype(str).str.lower().str.strip()
+                source_data["df"] = df
             
             # Exact match first
             matches = df[df["_search_col"] == search_term]
@@ -385,13 +392,13 @@ def instant_search(order_ids):
                 try:
                     matches = df[df["_search_col"].str.contains(search_term, na=False, regex=False)]
                 except:
-                    pass
+                    continue
             
             for _, row in matches.iterrows():
                 config = DATA_SOURCES[source_name]
                 row_data = row.to_dict()
                 
-                # Kerry status tab se status fetch karo - SAFE call
+                # Kerry status fetch - SAFE
                 live_status = get_latest_status_from_kerry(order_id)
                 if live_status:
                     row_data["_live_status_from_kerry"] = live_status
@@ -406,8 +413,6 @@ def instant_search(order_ids):
                 })
     
     return results
-
-def is_valid(val):
     if val is None:
         return False
     s = str(val).lower().strip()
