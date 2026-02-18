@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import re
@@ -537,52 +536,46 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================
-# DATA SOURCES CONFIGURATION
+# DATA SOURCES - PUBLISHED CSV LINKS
 # ============================================
 DATA_SOURCES = {
+    "APX": {
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRDEzAMUwnFZ7aoThGoMERtxxsll2kfEaSpa9ksXIx6sqbdMncts6Go2d5mKKabepbNXDSoeaUlk-mP/pub?gid=0&single=true&output=csv",
+        "order_col": "Fleek ID",
+        "date_col": "Fleek Handover Date",
+        "partner": "APX",
+        "badge_class": "badge-apx"
+    },
     "ECL QC Center": {
-        "sheet_id": "1VGP6HYxb-vf3pTlKCT-WyjZlf3sy_j8BrZnjjSxUVJA",
-        "tab": "Address and Tracking QC Center",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCiZ1MdPMyVAzBqmBmp3Ch8sfefOp_kfPk2RSfMv3bxRD_qccuwaoM7WTVsieKJbA3y3DF41tUxb3T/pub?gid=0&single=true&output=csv",
         "order_col": "Fleek ID",
         "date_col": "Fleek Handover Date",
         "partner": "ECL",
         "badge_class": "badge-ecl"
     },
     "ECL Zone": {
-        "sheet_id": "1VGP6HYxb-vf3pTlKCT-WyjZlf3sy_j8BrZnjjSxUVJA",
-        "tab": "Address and Tracking Zone",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCiZ1MdPMyVAzBqmBmp3Ch8sfefOp_kfPk2RSfMv3bxRD_qccuwaoM7WTVsieKJbA3y3DF41tUxb3T/pub?gid=928309568&single=true&output=csv",
         "order_col": 0,
         "date_col": "Fleek Handover Date",
         "partner": "ECL",
         "badge_class": "badge-ecl"
     },
     "GE QC Center": {
-        "sheet_id": "1Bt8od4x1xim2CO0vHcpYPR8eoA7L0XWqNsXqBsl9FBI",
-        "tab": "Address and Tracking - QC Centre",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjCPd8bUpx59Sit8gMMXjVKhIFA_f-W9Q4mkBSWulOTg4RGahcVXSD4xZiYBAcAH6eO40aEQ9IEEXj/pub?gid=710036753&single=true&output=csv",
         "order_col": "Order Num",
         "date_col": "Fleek Handover Date",
         "partner": "GE",
         "badge_class": "badge-ge"
     },
     "GE Zone": {
-        "sheet_id": "1Bt8od4x1xim2CO0vHcpYPR8eoA7L0XWqNsXqBsl9FBI",
-        "tab": "Address and Tracking - Zone",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjCPd8bUpx59Sit8gMMXjVKhIFA_f-W9Q4mkBSWulOTg4RGahcVXSD4xZiYBAcAH6eO40aEQ9IEEXj/pub?gid=10726393&single=true&output=csv",
         "order_col": 0,
         "date_col": "Airport Handover Date",
         "partner": "GE",
         "badge_class": "badge-ge"
     },
-    "APX": {
-        "sheet_id": "1WrrM_ewt0IcdG9ysKtXfIiSbSla52tsjq6FXP4rRlDo",
-        "tab": "Address and Tracking",
-        "order_col": "Fleek ID",
-        "date_col": "Fleek Handover Date",
-        "partner": "APX",
-        "badge_class": "badge-apx"
-    },
     "Kerry": {
-        "sheet_id": "12p1mTHfQKrmbekNK2H9IROyBxPaaBg1C0T6EDSyioko",
-        "tab": "Address and Tracking",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTZyLyZpVJz9sV5eT4Srwo_KZGnYggpRZkm2ILLYPQKSpTKkWfP9G5759h247O4QEflKCzlQauYsLKI/pub?gid=0&single=true&output=csv",
         "order_col": "_Order",
         "date_col": "Fleek Handover Date",
         "partner": "Kerry",
@@ -594,14 +587,14 @@ DATA_SOURCES = {
 # DATA LOADING FUNCTIONS
 # ============================================
 @st.cache_data(ttl=300)
-def load_sheet_data(sheet_id, tab_name):
-    """Load data from Google Sheet"""
+def load_sheet_data(source_name):
+    """Load data from published CSV link"""
     try:
-        url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={tab_name.replace(' ', '%20')}"
-        df = pd.read_csv(url)
+        config = DATA_SOURCES[source_name]
+        df = pd.read_csv(config["url"])
         return df
     except Exception as e:
-        st.error(f"Error loading {tab_name}: {e}")
+        st.error(f"Error loading {source_name}: {e}")
         return pd.DataFrame()
 
 def get_order_column(df, order_col_config):
@@ -638,7 +631,7 @@ def search_all_sources(orders):
     results = []
     
     for source_name, config in DATA_SOURCES.items():
-        df = load_sheet_data(config["sheet_id"], config["tab"])
+        df = load_sheet_data(source_name)
         if df.empty:
             continue
             
@@ -822,10 +815,11 @@ with tab_search:
 # ============================================
 # HELPER FUNCTION FOR DATA TABS
 # ============================================
-def render_data_tab(source_name, config):
+def render_data_tab(source_name):
     """Render a data tab with stats, filters, and data table"""
     
-    df = load_sheet_data(config["sheet_id"], config["tab"])
+    config = DATA_SOURCES[source_name]
+    df = load_sheet_data(source_name)
     
     if df.empty:
         st.warning(f"Unable to load data for {source_name}")
@@ -889,13 +883,6 @@ def render_data_tab(source_name, config):
         search_filter = st.text_input("🔍 Quick Search", placeholder="Search any field...", key=f"search_{source_name}")
     
     with col2:
-        # Date From filter
-        min_date = None
-        if '_parsed_date' in df.columns:
-            valid_dates = df['_parsed_date'].dropna()
-            if len(valid_dates) > 0:
-                min_date = min(valid_dates)
-        
         date_from = st.date_input(
             "📅 From Date",
             value=None,
@@ -904,7 +891,6 @@ def render_data_tab(source_name, config):
         )
     
     with col3:
-        # Date To filter
         date_to = st.date_input(
             "📅 To Date",
             value=None,
@@ -927,7 +913,6 @@ def render_data_tab(source_name, config):
         mask = filtered_df.astype(str).apply(lambda x: x.str.contains(search_filter, case=False, na=False)).any(axis=1)
         filtered_df = filtered_df[mask]
     
-    # Apply date filters
     if date_from and '_parsed_date' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df['_parsed_date'] >= date_from]
     
@@ -970,27 +955,27 @@ def render_data_tab(source_name, config):
 # ============================================
 with tab_ecl_qc:
     st.markdown("### 🟠 ECL QC Center")
-    render_data_tab("ECL QC Center", DATA_SOURCES["ECL QC Center"])
+    render_data_tab("ECL QC Center")
 
 with tab_ecl_zone:
     st.markdown("### 🟠 ECL Zone")
-    render_data_tab("ECL Zone", DATA_SOURCES["ECL Zone"])
+    render_data_tab("ECL Zone")
 
 with tab_ge_qc:
     st.markdown("### 🔵 GE QC Center")
-    render_data_tab("GE QC Center", DATA_SOURCES["GE QC Center"])
+    render_data_tab("GE QC Center")
 
 with tab_ge_zone:
     st.markdown("### 🔵 GE Zone")
-    render_data_tab("GE Zone", DATA_SOURCES["GE Zone"])
+    render_data_tab("GE Zone")
 
 with tab_apx:
     st.markdown("### 🟣 APX Logistics")
-    render_data_tab("APX", DATA_SOURCES["APX"])
+    render_data_tab("APX")
 
 with tab_kerry:
     st.markdown("### 🟢 Kerry Logistics")
-    render_data_tab("Kerry", DATA_SOURCES["Kerry"])
+    render_data_tab("Kerry")
 
 # ============================================
 # FOOTER
