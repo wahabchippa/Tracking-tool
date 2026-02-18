@@ -251,7 +251,6 @@ DISPLAY_FIELDS = {
     "📦 Shipment Details": [
         {"label": "Boxes", "aliases": ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "no. of boxes"], "type": "normal"},
         {"label": "Weight (kg)", "aliases": ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight", "order's net weight (kg)"], "type": "normal"},
-        # PIECES REMOVED
     ],
     "🚚 Tracking & Delivery": [
         {"label": "AWB", "aliases": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb"], "type": "highlight"},
@@ -282,9 +281,6 @@ def fetch_single_source(source_name):
         if isinstance(order_col, int):
             order_col = df.columns[order_col] if order_col < len(df.columns) else None
         
-        if order_col and order_col in df.columns:
-            df["_search_col"] = df[order_col].astype(str).str.lower().str.strip()
-        
         return source_name, df, order_col, None
     except Exception as e:
         return source_name, pd.DataFrame(), None, str(e)
@@ -294,8 +290,6 @@ def fetch_kerry_status_tab():
         response = requests.get(KERRY_STATUS_TAB_URL, timeout=120)
         response.raise_for_status()
         df = pd.read_csv(StringIO(response.text))
-        if "fleek_id" in df.columns:
-            df["_search_col"] = df["fleek_id"].astype(str).str.lower().str.strip()
         return df, None
     except Exception as e:
         return pd.DataFrame(), str(e)
@@ -339,11 +333,12 @@ def get_latest_status_from_kerry(order_id):
         status_data = st.session_state.all_data.get("_kerry_status_tab", {})
         df = status_data.get("df", pd.DataFrame())
         
-        if df.empty or "_search_col" not in df.columns:
+        if df.empty or "fleek_id" not in df.columns:
             return None
         
         search_term = str(order_id).lower().strip()
-        matches = df[df["_search_col"] == search_term]
+        df_search = df["fleek_id"].astype(str).str.lower().str.strip()
+        matches = df[df_search == search_term]
         
         if matches.empty:
             return None
@@ -355,10 +350,10 @@ def get_latest_status_from_kerry(order_id):
         
         return None
     except:
-        return None  # NEVER FAIL - just return None
+        return None
 
 # =============================================================================
-# SEARCH FUNCTION
+# SEARCH FUNCTION - FIXED
 # =============================================================================
 
 def instant_search(order_ids):
@@ -407,11 +402,21 @@ def instant_search(order_ids):
                         "order_id": order_id,
                         "data": row_data
                     })
-            except Exception as e:
+            except:
                 continue
     
-return results
-    
+    return results
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+def is_valid(val):
+    if val is None:
+        return False
+    s = str(val).lower().strip()
+    return s not in ['', 'nan', 'none', 'n/a', '#n/a', 'na', '-', 'null', 'nat', 'not applicable']
+
 def get_field_value(data, aliases):
     for key, val in data.items():
         if key.lower().strip() in [a.lower() for a in aliases]:
@@ -448,21 +453,6 @@ def render_result_card(result):
     """, unsafe_allow_html=True)
     
     for section_name, fields in DISPLAY_FIELDS.items():
-        # Live Status section - show even if empty (will show "—")
-        if section_name == "📡 Live Status":
-            st.markdown(f"<div class='section-title'>{section_name}</div>", unsafe_allow_html=True)
-            cols = st.columns(2)
-            for i, field in enumerate(fields):
-                value = get_field_value(data, field["aliases"])
-                with cols[i % 2]:
-                    st.markdown(f"<div class='field-label'>{field['label']}</div>", unsafe_allow_html=True)
-                    if value:
-                        st.markdown(f"<div class='field-value field-value-status'>📡 {value}</div>", unsafe_allow_html=True)
-                    else:
-                        st.markdown("<div class='field-value field-value-empty'>—</div>", unsafe_allow_html=True)
-            continue
-        
-        # Other sections
         st.markdown(f"<div class='section-title'>{section_name}</div>", unsafe_allow_html=True)
         
         cols = st.columns(2)
@@ -476,7 +466,10 @@ def render_result_card(result):
                         "tracking": "field-value-tracking", 
                         "status": "field-value-status"
                     }.get(field["type"], "")
-                    st.markdown(f"<div class='field-value {css_class}'>{value}</div>", unsafe_allow_html=True)
+                    if field["type"] == "status":
+                        st.markdown(f"<div class='field-value {css_class}'>📡 {value}</div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"<div class='field-value {css_class}'>{value}</div>", unsafe_allow_html=True)
                 else:
                     st.markdown("<div class='field-value field-value-empty'>—</div>", unsafe_allow_html=True)
     
@@ -514,7 +507,6 @@ def render_sidebar():
         return page
 
 def search_page():
-    # Hero - sirf heading badi
     st.markdown("""
     <div class="hero-container">
         <h1 class="hero-title">🔎 TrackMaster Pro</h1>
@@ -522,7 +514,6 @@ def search_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Search input
     col1, col2 = st.columns([5, 1])
     with col1:
         search_input = st.text_input(
@@ -536,7 +527,6 @@ def search_page():
     
     st.markdown('<p class="search-hint">💡 Multiple orders: comma ya space se separate karein</p>', unsafe_allow_html=True)
     
-    # Search logic
     if search_input and search_input.strip():
         order_ids = [x.strip() for x in re.split(r'[\n,\t\s]+', search_input) if x.strip()]
         
@@ -562,7 +552,6 @@ def search_page():
                 st.error(f"❌ No results for: {', '.join(order_ids)}")
                 st.info("💡 Order ID check karein ya different ID try karein")
     else:
-        # Partner cards
         st.markdown("---")
         counts = get_partner_counts()
         
@@ -619,7 +608,7 @@ def data_page(source_name):
     st.markdown("---")
     
     filter_text = st.text_input("🔍 Filter...", key=f"filter_{source_name}")
-    display_df = df.drop(columns=["_search_col"], errors="ignore")
+    display_df = df.copy()
     
     if filter_text:
         mask = display_df.astype(str).apply(lambda x: x.str.contains(filter_text, case=False, na=False)).any(axis=1)
