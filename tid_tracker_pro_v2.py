@@ -373,46 +373,44 @@ def instant_search(order_ids):
             if source_name == "_kerry_status_tab":
                 continue
             
-            df = source_data.get("df", pd.DataFrame())
-            order_col = source_data.get("order_col")
-            
-            if df.empty or order_col is None:
-                continue
-            
-            # Create search column if not exists
-            if "_search_col" not in df.columns:
-                df["_search_col"] = df[order_col].astype(str).str.lower().str.strip()
-                source_data["df"] = df
-            
-            # Exact match first
-            matches = df[df["_search_col"] == search_term]
-            
-            # Fallback to contains search
-            if matches.empty:
-                try:
-                    matches = df[df["_search_col"].str.contains(search_term, na=False, regex=False)]
-                except:
+            try:
+                df = source_data.get("df", pd.DataFrame())
+                order_col = source_data.get("order_col")
+                
+                if df.empty or order_col is None or order_col not in df.columns:
                     continue
-            
-            for _, row in matches.iterrows():
-                config = DATA_SOURCES[source_name]
-                row_data = row.to_dict()
                 
-                # Kerry status fetch - SAFE
-                live_status = get_latest_status_from_kerry(order_id)
-                if live_status:
-                    row_data["_live_status_from_kerry"] = live_status
+                # Search using order column directly
+                df_search = df[order_col].astype(str).str.lower().str.strip()
                 
-                results.append({
-                    "source": source_name,
-                    "partner": config["partner"],
-                    "type": config["type"],
-                    "icon": config["icon"],
-                    "order_id": order_id,
-                    "data": row_data
-                })
+                # Exact match first
+                matches = df[df_search == search_term]
+                
+                # Fallback to contains search
+                if matches.empty:
+                    matches = df[df_search.str.contains(search_term, na=False, regex=False)]
+                
+                for _, row in matches.iterrows():
+                    config = DATA_SOURCES[source_name]
+                    row_data = row.to_dict()
+                    
+                    # Kerry status fetch - SAFE
+                    live_status = get_latest_status_from_kerry(order_id)
+                    if live_status:
+                        row_data["_live_status_from_kerry"] = live_status
+                    
+                    results.append({
+                        "source": source_name,
+                        "partner": config["partner"],
+                        "type": config["type"],
+                        "icon": config["icon"],
+                        "order_id": order_id,
+                        "data": row_data
+                    })
+            except Exception as e:
+                continue
     
-    return results
+    return results    return results
     if val is None:
         return False
     s = str(val).lower().strip()
