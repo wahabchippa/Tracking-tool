@@ -11,104 +11,79 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# ==================== TID REFERENCE COLUMNS (ONLY THESE WILL SHOW) ====================
+TID_REQUIRED_COLUMNS = [
+    "order#", "order no", "order no.", "order num", "fleek id", "_order", "order_id", "order",
+    "upload date", "fleek handover date", "airport handover date", "handover date", "date",
+    "services", "service", "partner",
+    "line_item_batch_id", "batch_id",
+    "fulfillment_id",
+    "invoice_id",
+    "invoice_type",
+    "weight_kgs", "weight (kg)", "weight", "order net weight", "order weight",
+    "box_count", "boxes", "box count",
+    "airway_bill", "awb", "hawb", "mawb", "planned mawb", "apx awb number", "kerry awb number", "ge awb",
+    "courier_service", "courier", "3pl", "carrier",
+    "courier_tracking_ids", "tracking id", "tracking_id", "trackingid", "tracking",
+    "reference", "ref",
+    "shipping_account", "shipping account",
+    "consignee", "customer name", "customer_name", "customer", "name",
+    "destination", "country", "city", "zone",
+    "invoice_amount", "amount", "price", "cost", "value", "cod",
+    "invoice_currency", "currency",
+    "status", "qc status", "qc_status", "delivery status"
+]
+
 # ==================== FIELD ICONS MAPPING ====================
 FIELD_ICONS = {
     # Order & IDs
-    "order": "🆔",
-    "order#": "🆔",
-    "order no": "🆔",
-    "order num": "🆔",
-    "fleek id": "🆔",
-    "_order": "🆔",
-    "id": "🔢",
-    "fulfillment": "📦",
-    "batch": "📑",
+    "order": "🆔", "order#": "🆔", "order no": "🆔", "order num": "🆔",
+    "fleek id": "🆔", "_order": "🆔", "order_id": "🆔",
+    "line_item_batch_id": "📑", "batch": "📑",
+    "fulfillment_id": "✅", "fulfillment": "✅",
+    "invoice_id": "🧾", "invoice_type": "📄",
     
     # Tracking & AWB
-    "tracking id": "📍",
-    "trackingid": "📍",
-    "tracking": "📍",
-    "awb": "🎫",
-    "hawb": "🎫",
-    "mawb": "✈️",
-    "planned mawb": "✈️",
-    "apx awb number": "🎫",
-    "kerry awb number": "🎫",
-    "ge awb": "🎫",
+    "tracking id": "📍", "trackingid": "📍", "tracking": "📍",
+    "courier_tracking_ids": "📍",
+    "awb": "🎫", "hawb": "🎫", "airway_bill": "🎫",
+    "mawb": "✈️", "planned mawb": "✈️",
+    "apx awb number": "🎫", "kerry awb number": "🎫", "ge awb": "🎫",
     
     # Dates
-    "date": "📅",
-    "fleek handover date": "📤",
-    "handover date": "📤",
+    "date": "📅", "upload date": "📅",
+    "fleek handover date": "📤", "handover date": "📤",
     "airport handover date": "🛫",
-    "apx entry date": "📥",
-    "ge entry date": "📥",
-    "kerry entry date": "📥",
-    "ge receiving date": "📥",
-    "entry date": "📥",
-    "receiving date": "📥",
+    "entry date": "📥", "receiving date": "📥",
     
     # Customer & Contact
-    "customer": "👤",
-    "customer name": "👤",
-    "name": "👤",
-    "contact": "📞",
-    "phone": "📱",
-    "email": "📧",
-    "address": "🏠",
-    "consignee": "👤",
+    "customer": "👤", "customer name": "👤", "consignee": "👤", "name": "👤",
+    "contact": "📞", "phone": "📱", "email": "📧", "address": "🏠",
     
     # Location
-    "country": "🌍",
-    "city": "🏙️",
-    "zone": "📍",
-    "region": "🗺️",
-    "destination": "🎯",
+    "country": "🌍", "city": "🏙️", "zone": "📍",
+    "region": "🗺️", "destination": "🎯",
     
     # Shipping & Logistics
-    "courier": "🚚",
-    "3pl": "🚛",
-    "carrier": "🚛",
-    "vendor": "🏢",
-    "vendor name": "🏢",
-    "services": "⚙️",
-    "service": "⚙️",
-    "sea/air": "🚢",
-    "mode": "🔄",
+    "courier": "🚚", "courier_service": "🚚",
+    "3pl": "🚛", "carrier": "🚛",
+    "services": "⚙️", "service": "⚙️",
+    "shipping_account": "📮", "shipping account": "📮",
     
     # Package Details
-    "boxes": "📦",
-    "box": "📦",
-    "weight": "⚖️",
-    "order net weight": "⚖️",
-    "order weight": "⚖️",
-    "kg": "⚖️",
-    "dimensions": "📐",
-    "size": "📐",
+    "boxes": "📦", "box_count": "📦", "box count": "📦",
+    "weight": "⚖️", "weight_kgs": "⚖️", "weight (kg)": "⚖️",
     
     # Status
-    "status": "🔔",
-    "qc status": "✅",
-    "delivery status": "🚦",
-    "state": "📊",
+    "status": "🔔", "qc status": "✅", "qc_status": "✅",
     
     # Financial
-    "price": "💰",
-    "cost": "💵",
-    "amount": "💳",
-    "value": "💎",
-    "cod": "💵",
-    "invoice": "🧾",
-    "currency": "💱",
+    "invoice_amount": "💰", "amount": "💰", "price": "💰",
+    "invoice_currency": "💱", "currency": "💱",
+    "cost": "💵", "value": "💎", "cod": "💵",
     
-    # Notes & Others
-    "notes": "📝",
-    "remarks": "📝",
-    "comment": "💬",
-    "description": "📄",
-    "ref": "🔗",
-    "reference": "🔗",
-    "shipping": "📮",
+    # Reference
+    "reference": "🔗", "ref": "🔗",
     "partner": "🤝",
 }
 
@@ -125,7 +100,7 @@ def get_icon(field_name):
         if key in field_lower or field_lower in key:
             return icon
     
-    # Default icon based on common patterns
+    # Default patterns
     if "date" in field_lower or "time" in field_lower:
         return "📅"
     if "id" in field_lower or "num" in field_lower or "no" in field_lower:
@@ -135,7 +110,31 @@ def get_icon(field_name):
     if "track" in field_lower:
         return "📍"
     
-    return "📋"  # Default
+    return "📋"
+
+def is_tid_column(col_name):
+    """Check if column is in TID required columns (case-insensitive)"""
+    col_lower = col_name.lower().strip()
+    tid_lower = [c.lower().strip() for c in TID_REQUIRED_COLUMNS]
+    
+    # Direct match
+    if col_lower in tid_lower:
+        return True
+    
+    # Partial match for flexibility
+    for tid_col in tid_lower:
+        if tid_col in col_lower or col_lower in tid_col:
+            return True
+    
+    return False
+
+def filter_tid_columns(data_dict):
+    """Filter dictionary to only include TID columns"""
+    filtered = {}
+    for key, val in data_dict.items():
+        if is_tid_column(key):
+            filtered[key] = val
+    return filtered
 
 # ==================== PREMIUM CSS STYLING ====================
 st.markdown("""
@@ -265,45 +264,6 @@ st.markdown("""
         color: var(--text-secondary);
         margin-top: 0.5rem;
         font-weight: 400;
-    }
-    
-    /* Search Container */
-    .search-container {
-        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 20px;
-        padding: 2rem;
-        margin: 2rem auto;
-        max-width: 900px;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    
-    .search-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    /* Glass Card */
-    .glass-card {
-        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-    }
-    
-    .glass-card:hover {
-        border-color: rgba(255,255,255,0.15);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
     
     /* Stats Cards */
@@ -506,7 +466,7 @@ st.markdown("""
         box-shadow: 0 0 20px rgba(245, 158, 11, 0.1) !important;
     }
     
-    /* Date Input Styling */
+    /* Date Input */
     .stDateInput > div > div > input {
         background: rgba(255,255,255,0.05) !important;
         border: 1px solid rgba(255,255,255,0.1) !important;
@@ -514,7 +474,7 @@ st.markdown("""
         color: var(--text-primary) !important;
     }
     
-    /* Dataframe Styling */
+    /* Dataframe */
     .stDataFrame {
         background: rgba(255,255,255,0.02);
         border-radius: 12px;
@@ -553,7 +513,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ==================== DATA SOURCES - PUBLISHED CSV LINKS ====================
+# ==================== DATA SOURCES ====================
 DATA_SOURCES = {
     "APX": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRDEzAMUwnFZ7aoThGoMERtxxsll2kfEaSpa9ksXIx6sqbdMncts6Go2d5mKKabepbNXDSoeaUlk-mP/pub?gid=0&single=true&output=csv",
@@ -599,7 +559,7 @@ DATA_SOURCES = {
     }
 }
 
-# ==================== DATA LOADING FUNCTIONS ====================
+# ==================== DATA FUNCTIONS ====================
 @st.cache_data(ttl=300)
 def load_sheet_data(source_name):
     """Load data from published CSV link"""
@@ -612,7 +572,7 @@ def load_sheet_data(source_name):
         return pd.DataFrame()
 
 def get_order_column(df, order_col_config):
-    """Get the order column name from config (handles both named and index-based)"""
+    """Get the order column name from config"""
     if isinstance(order_col_config, int):
         return df.columns[order_col_config] if len(df.columns) > order_col_config else None
     return order_col_config if order_col_config in df.columns else None
@@ -623,8 +583,6 @@ def parse_date(date_str):
         return None
     
     date_str = str(date_str).strip()
-    
-    # Try different formats
     formats = ['%d/%m/%Y', '%d/%m/%y', '%Y-%m-%d', '%d-%m-%Y', '%d-%m-%y']
     
     for fmt in formats:
@@ -632,11 +590,10 @@ def parse_date(date_str):
             return datetime.strptime(date_str, fmt).date()
         except:
             continue
-    
     return None
 
 def parse_orders(input_text):
-    """Parse multiple orders from input (handles newlines, commas, spaces, tabs)"""
+    """Parse multiple orders from input"""
     orders = re.split(r'[\n,\t\s]+', input_text.strip())
     return [o.strip() for o in orders if o.strip()]
 
@@ -658,18 +615,20 @@ def search_all_sources(orders):
         for order in orders:
             matches = df[df[order_col].str.contains(order, case=False, na=False)]
             for _, row in matches.iterrows():
+                # Filter to only TID columns
+                filtered_data = filter_tid_columns(row.to_dict())
                 results.append({
                     "source": source_name,
                     "partner": config["partner"],
                     "badge_class": config["badge_class"],
                     "order": row[order_col],
-                    "data": row.to_dict()
+                    "data": filtered_data
                 })
     
     return results
 
 def is_valid_value(val):
-    """Check if a value is valid (not N/A, empty, etc.)"""
+    """Check if a value is valid"""
     if pd.isna(val):
         return False
     val_str = str(val).strip().lower()
@@ -681,6 +640,13 @@ def format_value(val):
     if not is_valid_value(val):
         return "-"
     return str(val).strip()
+
+def filter_tid_columns_df(df):
+    """Filter DataFrame to only TID columns"""
+    tid_cols = [col for col in df.columns if is_tid_column(col)]
+    if tid_cols:
+        return df[tid_cols]
+    return df  # Return all if no matches
 
 # ==================== HEADER ====================
 st.markdown("""
@@ -706,7 +672,6 @@ tab_search, tab_ecl_qc, tab_ecl_zone, tab_ge_qc, tab_ge_zone, tab_apx, tab_kerry
 
 # ==================== GLOBAL SEARCH TAB ====================
 with tab_search:
-    # Centered search container
     col_left, col_center, col_right = st.columns([1, 2, 1])
     
     with col_center:
@@ -731,6 +696,7 @@ with tab_search:
                 results = search_all_sources(orders)
             
             if results:
+                # Stats
                 st.markdown(f"""
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -756,6 +722,7 @@ with tab_search:
                 </div>
                 """, unsafe_allow_html=True)
                 
+                # Result cards
                 for result in results:
                     order_id = result['order']
                     partner = result['partner']
@@ -763,7 +730,7 @@ with tab_search:
                     data = result['data']
                     source = result['source']
                     
-                    # Build fields HTML with icons
+                    # Build fields HTML (only TID columns)
                     fields_html = ""
                     for key, val in data.items():
                         if show_valid_only and not is_valid_value(val):
@@ -795,7 +762,7 @@ with tab_search:
                     </div>
                     """, unsafe_allow_html=True)
                 
-                # Download results
+                # Download
                 st.markdown("---")
                 results_df = pd.DataFrame([{**{"Source": r["source"], "Partner": r["partner"]}, **r["data"]} for r in results])
                 csv = results_df.to_csv(index=False)
@@ -815,9 +782,9 @@ with tab_search:
                 </div>
                 """, unsafe_allow_html=True)
 
-# ==================== HELPER FUNCTION FOR DATA TABS ====================
+# ==================== DATA TAB HELPER ====================
 def render_data_tab(source_name):
-    """Render a data tab with stats, filters, and data table"""
+    """Render a data tab with stats, filters, and filtered TID columns"""
     
     config = DATA_SOURCES[source_name]
     df = load_sheet_data(source_name)
@@ -829,23 +796,24 @@ def render_data_tab(source_name):
     order_col = get_order_column(df, config["order_col"])
     date_col = config.get("date_col")
     
-    # Parse dates if date column exists
+    # Parse dates
     if date_col and date_col in df.columns:
         df['_parsed_date'] = df[date_col].apply(parse_date)
     
+    # Filter to TID columns only
+    display_df = filter_tid_columns_df(df)
+    
     # Stats
     total_orders = len(df)
+    boxes_col = next((c for c in display_df.columns if 'box' in c.lower()), None)
+    weight_col = next((c for c in display_df.columns if 'weight' in c.lower()), None)
+    country_col = next((c for c in display_df.columns if 'country' in c.lower() or 'destination' in c.lower()), None)
+    tracking_col = next((c for c in display_df.columns if 'tracking' in c.lower()), None)
     
-    # Try to find common columns for stats
-    boxes_col = next((c for c in df.columns if 'box' in c.lower()), None)
-    weight_col = next((c for c in df.columns if 'weight' in c.lower()), None)
-    country_col = next((c for c in df.columns if 'country' in c.lower()), None)
-    tracking_col = next((c for c in df.columns if 'tracking' in c.lower()), None)
-    
-    total_boxes = df[boxes_col].sum() if boxes_col and pd.api.types.is_numeric_dtype(df[boxes_col]) else 0
-    total_weight = df[weight_col].sum() if weight_col and pd.api.types.is_numeric_dtype(df[weight_col]) else 0
-    unique_countries = df[country_col].nunique() if country_col else 0
-    with_tracking = df[tracking_col].apply(is_valid_value).sum() if tracking_col else 0
+    total_boxes = df[boxes_col].sum() if boxes_col and boxes_col in df.columns and pd.api.types.is_numeric_dtype(df[boxes_col]) else 0
+    total_weight = df[weight_col].sum() if weight_col and weight_col in df.columns and pd.api.types.is_numeric_dtype(df[weight_col]) else 0
+    unique_countries = df[country_col].nunique() if country_col and country_col in df.columns else 0
+    with_tracking = df[tracking_col].apply(is_valid_value).sum() if tracking_col and tracking_col in df.columns else 0
     
     st.markdown(f"""
     <div class="stats-grid">
@@ -884,20 +852,10 @@ def render_data_tab(source_name):
         search_filter = st.text_input("🔍 Quick Search", placeholder="Search any field...", key=f"search_{source_name}")
     
     with col2:
-        date_from = st.date_input(
-            "📅 From Date",
-            value=None,
-            key=f"date_from_{source_name}",
-            help="Filter records from this date"
-        )
+        date_from = st.date_input("📅 From Date", value=None, key=f"date_from_{source_name}")
     
     with col3:
-        date_to = st.date_input(
-            "📅 To Date",
-            value=None,
-            key=f"date_to_{source_name}",
-            help="Filter records until this date"
-        )
+        date_to = st.date_input("📅 To Date", value=None, key=f"date_to_{source_name}")
     
     with col4:
         valid_only = st.checkbox("Valid Only", value=False, key=f"valid_{source_name}")
@@ -908,32 +866,32 @@ def render_data_tab(source_name):
             st.rerun()
     
     # Apply filters
-    filtered_df = df.copy()
+    filtered_df = display_df.copy()
     
     if search_filter:
         mask = filtered_df.astype(str).apply(lambda x: x.str.contains(search_filter, case=False, na=False)).any(axis=1)
         filtered_df = filtered_df[mask]
     
-    if date_from and '_parsed_date' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['_parsed_date'] >= date_from]
+    if date_from and '_parsed_date' in df.columns:
+        valid_indices = df[df['_parsed_date'] >= date_from].index
+        filtered_df = filtered_df.loc[filtered_df.index.intersection(valid_indices)]
     
-    if date_to and '_parsed_date' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['_parsed_date'] <= date_to]
+    if date_to and '_parsed_date' in df.columns:
+        valid_indices = df[df['_parsed_date'] <= date_to].index
+        filtered_df = filtered_df.loc[filtered_df.index.intersection(valid_indices)]
     
-    if valid_only and tracking_col:
-        filtered_df = filtered_df[filtered_df[tracking_col].apply(is_valid_value)]
+    if valid_only and tracking_col and tracking_col in df.columns:
+        valid_indices = df[df[tracking_col].apply(is_valid_value)].index
+        filtered_df = filtered_df.loc[filtered_df.index.intersection(valid_indices)]
     
-    # Remove the helper column for display
-    display_df = filtered_df.drop(columns=['_parsed_date'], errors='ignore')
-    
-    # Display data
-    st.markdown(f"**Showing {len(filtered_df):,} of {len(df):,} records**")
-    st.dataframe(display_df, use_container_width=True, height=500)
+    # Display
+    st.markdown(f"**Showing {len(filtered_df):,} of {len(df):,} records** | **Columns: {len(filtered_df.columns)}**")
+    st.dataframe(filtered_df, use_container_width=True, height=500)
     
     # Downloads
     col1, col2 = st.columns(2)
     with col1:
-        csv = display_df.to_csv(index=False)
+        csv = filtered_df.to_csv(index=False)
         st.download_button(
             "📥 Download Filtered (CSV)",
             csv,
@@ -942,7 +900,7 @@ def render_data_tab(source_name):
             use_container_width=True
         )
     with col2:
-        csv_all = df.drop(columns=['_parsed_date'], errors='ignore').to_csv(index=False)
+        csv_all = display_df.to_csv(index=False)
         st.download_button(
             "📥 Download All (CSV)",
             csv_all,
