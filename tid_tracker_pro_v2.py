@@ -410,7 +410,7 @@ def instant_search(order_ids):
             except Exception as e:
                 continue
     
-    return results    return results
+return results
     if val is None:
         return False
     s = str(val).lower().strip()
