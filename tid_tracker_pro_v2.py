@@ -238,31 +238,31 @@ DATA_SOURCES = {
 KERRY_STATUS_TAB_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTZyLyZpVJz9sV5eT4Srwo_KZGnYggpRZkm2ILLYPQKSpTKkWfP9G5759h247O4QEflKCzlQauYsLKI/pub?gid=2121564686&single=true&output=csv"
 
 # =============================================================================
-# DISPLAY FIELDS - PIECES REMOVED
+# DISPLAY FIELDS - FIXED ORDER: Latest Status UPAR, Order Number & Weight FIXED
 # =============================================================================
 
 DISPLAY_FIELDS = {
+    "📡 Live Status": [
+        {"label": "Latest Status", "aliases": ["_live_status_from_kerry", "latest_status", "status", "current_status"], "type": "status"},
+    ],
     "📋 Order Information": [
-        {"label": "Order Number", "aliases": ["order#", "order", "fleek id", "_order", "order no", "order num"], "type": "highlight"},
-        {"label": "Handover Date", "aliases": ["date", "fleek handover date", "airport handover date", "handover date", "ge entry date"], "type": "normal"},
-        {"label": "Service", "aliases": ["services", "service", "partner", "3pl", "sea / air"], "type": "normal"},
-        {"label": "QC Status", "aliases": ["qc status", "qc_status"], "type": "normal"},
+        {"label": "Order Number", "aliases": ["order#", "order", "fleek id", "_order", "order no", "order num", "order_num", "order number", "ordernumber", "fleek_id", "fleekid"], "type": "highlight"},
+        {"label": "Handover Date", "aliases": ["date", "fleek handover date", "airport handover date", "handover date", "ge entry date", "handover_date"], "type": "normal"},
+        {"label": "Service", "aliases": ["services", "service", "partner", "3pl", "sea / air", "sea/air"], "type": "normal"},
+        {"label": "QC Status", "aliases": ["qc status", "qc_status", "qcstatus"], "type": "normal"},
     ],
     "📦 Shipment Details": [
-        {"label": "Boxes", "aliases": ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "no. of boxes"], "type": "normal"},
-        {"label": "Weight (kg)", "aliases": ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight", "order's net weight (kg)"], "type": "normal"},
+        {"label": "Boxes", "aliases": ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "no. of boxes", "boxcount", "total_boxes"], "type": "normal"},
+        {"label": "Weight (kg)", "aliases": ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight", "order's net weight (kg)", "weight_kg", "weightkg", "total_weight", "net_weight", "gross_weight", "wt", "wt.", "wt (kg)", "weight(kg)"], "type": "normal"},
     ],
     "🚚 Tracking & Delivery": [
-        {"label": "AWB", "aliases": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb"], "type": "highlight"},
-        {"label": "Tracking ID", "aliases": ["courier_tracking_ids", "tracking id", "tracking_id", "tracking", "ge comment / tracking"], "type": "tracking"},
-        {"label": "Courier", "aliases": ["courier_service", "courier", "carrier"], "type": "normal"},
+        {"label": "AWB", "aliases": ["airway_bill", "awb", "hawb", "mawb", "apx awb number", "kerry awb number", "ge awb", "awb_number", "awbnumber"], "type": "highlight"},
+        {"label": "Tracking ID", "aliases": ["courier_tracking_ids", "tracking id", "tracking_id", "tracking", "ge comment / tracking", "trackingid", "tracking_number"], "type": "tracking"},
+        {"label": "Courier", "aliases": ["courier_service", "courier", "carrier", "courier_name"], "type": "normal"},
     ],
     "👤 Customer Info": [
-        {"label": "Customer Name", "aliases": ["consignee", "customer name", "customer_name", "customer", "name"], "type": "normal"},
-        {"label": "Destination", "aliases": ["destination", "country", "city"], "type": "normal"},
-    ],
-    "📡 Live Status": [
-        {"label": "Latest Status", "aliases": ["_live_status_from_kerry"], "type": "status"},
+        {"label": "Customer Name", "aliases": ["consignee", "customer name", "customer_name", "customer", "name", "cust_name", "custname"], "type": "normal"},
+        {"label": "Destination", "aliases": ["destination", "country", "city", "dest", "destination_city"], "type": "normal"},
     ],
 }
 
@@ -353,7 +353,7 @@ def get_latest_status_from_kerry(order_id):
         return None
 
 # =============================================================================
-# SEARCH FUNCTION - FIXED
+# SEARCH FUNCTION - FIXED WITH ORDER NUMBER INJECTION
 # =============================================================================
 
 def instant_search(order_ids):
@@ -389,6 +389,12 @@ def instant_search(order_ids):
                     config = DATA_SOURCES[source_name]
                     row_data = row.to_dict()
                     
+                    # ✅ FIX: Order Number ko explicitly inject karo
+                    # Agar order_col se value mili hai, toh use "Order Number" key mein daalo
+                    order_value = row.get(order_col)
+                    if pd.notna(order_value):
+                        row_data["Order Number"] = str(order_value)
+                    
                     # Kerry status fetch - SAFE
                     live_status = get_latest_status_from_kerry(order_id)
                     if live_status:
@@ -408,7 +414,7 @@ def instant_search(order_ids):
     return results
 
 # =============================================================================
-# HELPER FUNCTIONS
+# HELPER FUNCTIONS - IMPROVED MATCHING
 # =============================================================================
 
 def is_valid(val):
@@ -418,10 +424,23 @@ def is_valid(val):
     return s not in ['', 'nan', 'none', 'n/a', '#n/a', 'na', '-', 'null', 'nat', 'not applicable']
 
 def get_field_value(data, aliases):
+    # First: exact key match (case-insensitive)
     for key, val in data.items():
-        if key.lower().strip() in [a.lower() for a in aliases]:
-            if is_valid(val):
-                return str(val)
+        key_lower = key.lower().strip()
+        for alias in aliases:
+            if key_lower == alias.lower().strip():
+                if is_valid(val):
+                    return str(val)
+    
+    # Second: partial match (for variations)
+    for key, val in data.items():
+        key_lower = key.lower().strip().replace(" ", "").replace("_", "")
+        for alias in aliases:
+            alias_clean = alias.lower().strip().replace(" ", "").replace("_", "")
+            if key_lower == alias_clean or alias_clean in key_lower or key_lower in alias_clean:
+                if is_valid(val):
+                    return str(val)
+    
     return None
 
 def get_partner_counts():
