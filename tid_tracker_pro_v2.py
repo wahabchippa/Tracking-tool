@@ -32,33 +32,6 @@ st.markdown("""
         border-right: 1px solid rgba(255,255,255,0.05);
     }
     
-    /* SIDEBAR BUTTONS */
-    .sidebar-btn {
-        display: block;
-        width: 100%;
-        padding: 12px 16px;
-        margin: 4px 0;
-        background: rgba(255,255,255,0.02);
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 10px;
-        color: #888;
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .sidebar-btn:hover {
-        background: rgba(99, 102, 241, 0.1);
-        border-color: rgba(99, 102, 241, 0.3);
-        color: #fff;
-    }
-    .sidebar-btn-active {
-        background: rgba(99, 102, 241, 0.2) !important;
-        border-color: rgba(99, 102, 241, 0.5) !important;
-        color: #fff !important;
-    }
-    
     /* HERO */
     .hero-container { text-align: center; padding: 30px 20px 20px 20px; }
     
@@ -233,48 +206,42 @@ DATA_SOURCES = {
         "order_col": "Fleek ID",
         "partner": "ECL",
         "type": "QC Center",
-        "icon": "🟠",
-        "date_col": ["date", "fleek handover date", "handover date"]
+        "icon": "🟠"
     },
     "ECL Zone": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCiZ1MdPMyVAzBqmBmp3Ch8sfefOp_kfPk2RSfMv3bxRD_qccuwaoM7WTVsieKJbA3y3DF41tUxb3T/pub?gid=928309568&single=true&output=csv",
         "order_col": 0,
         "partner": "ECL",
         "type": "Zone",
-        "icon": "🟠",
-        "date_col": ["date", "fleek handover date", "handover date"]
+        "icon": "🟠"
     },
     "GE QC Center": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjCPd8bUpx59Sit8gMMXjVKhIFA_f-W9Q4mkBSWulOTg4RGahcVXSD4xZiYBAcAH6eO40aEQ9IEEXj/pub?gid=710036753&single=true&output=csv",
         "order_col": "Order Num",
         "partner": "GE",
         "type": "QC Center",
-        "icon": "🔵",
-        "date_col": ["date", "ge entry date", "handover date"]
+        "icon": "🔵"
     },
     "GE Zone": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjCPd8bUpx59Sit8gMMXjVKhIFA_f-W9Q4mkBSWulOTg4RGahcVXSD4xZiYBAcAH6eO40aEQ9IEEXj/pub?gid=10726393&single=true&output=csv",
         "order_col": 0,
         "partner": "GE",
         "type": "Zone",
-        "icon": "🔵",
-        "date_col": ["date", "ge entry date", "handover date"]
+        "icon": "🔵"
     },
     "APX": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRDEzAMUwnFZ7aoThGoMERtxxsll2kfEaSpa9ksXIx6sqbdMncts6Go2d5mKKabepbNXDSoeaUlk-mP/pub?gid=0&single=true&output=csv",
         "order_col": "Fleek ID",
         "partner": "APX",
         "type": "",
-        "icon": "🟣",
-        "date_col": ["date", "handover date", "airport handover date"]
+        "icon": "🟣"
     },
     "Kerry": {
         "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTZyLyZpVJz9sV5eT4Srwo_KZGnYggpRZkm2ILLYPQKSpTKkWfP9G5759h247O4QEflKCzlQauYsLKI/pub?gid=0&single=true&output=csv",
         "order_col": "_Order",
         "partner": "Kerry",
         "type": "",
-        "icon": "🟢",
-        "date_col": ["date", "handover date"]
+        "icon": "🟢"
     }
 }
 
@@ -428,46 +395,77 @@ def get_partner_counts():
         counts[partner] += len(data["df"])
     return counts
 
-def find_date_column(df, date_aliases):
-    """Find the date column in dataframe"""
-    for col in df.columns:
-        col_lower = col.lower().strip()
-        for alias in date_aliases:
-            if alias.lower() in col_lower or col_lower in alias.lower():
-                return col
-    return None
-
-def parse_date(date_val):
-    """Try to parse date from various formats"""
-    if pd.isna(date_val):
-        return None
-    
-    date_str = str(date_val).strip()
-    
-    formats = [
-        "%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y",
-        "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y",
-        "%d %b %Y", "%d %B %Y", "%b %d, %Y",
-        "%Y-%m-%d %H:%M:%S", "%d-%m-%Y %H:%M:%S"
+def find_date_column(df):
+    """Find the date column in dataframe - IMPROVED"""
+    date_keywords = [
+        "date", "handover", "entry", "created", "timestamp", 
+        "fleek handover", "airport handover", "ge entry"
     ]
     
-    for fmt in formats:
+    for col in df.columns:
+        col_lower = col.lower().strip()
+        for keyword in date_keywords:
+            if keyword in col_lower:
+                return col
+    
+    # Fallback: check first few columns for date-like data
+    for col in df.columns[:10]:
         try:
-            return datetime.strptime(date_str, fmt).date()
+            sample = df[col].dropna().head(5)
+            if len(sample) > 0:
+                # Check if looks like date
+                sample_str = str(sample.iloc[0])
+                if any(c in sample_str for c in ['/', '-']) and len(sample_str) >= 8:
+                    pd.to_datetime(sample, errors='coerce')
+                    return col
         except:
             continue
     
     return None
+
+def smart_parse_date(date_series):
+    """Smart date parsing with multiple format attempts"""
+    if date_series.empty:
+        return pd.Series(dtype='datetime64[ns]')
+    
+    # Try pandas auto-detect first
+    try:
+        parsed = pd.to_datetime(date_series, errors='coerce', dayfirst=True)
+        if parsed.notna().sum() > len(date_series) * 0.5:  # At least 50% success
+            return parsed
+    except:
+        pass
+    
+    # Try specific formats
+    formats_to_try = [
+        "%d/%m/%Y",      # 17/02/2026
+        "%d-%m-%Y",      # 17-02-2026
+        "%Y-%m-%d",      # 2026-02-17
+        "%m/%d/%Y",      # 02/17/2026
+        "%d %b %Y",      # 17 Feb 2026
+        "%d %B %Y",      # 17 February 2026
+        "%Y/%m/%d",      # 2026/02/17
+        "%d.%m.%Y",      # 17.02.2026
+    ]
+    
+    for fmt in formats_to_try:
+        try:
+            parsed = pd.to_datetime(date_series, format=fmt, errors='coerce')
+            if parsed.notna().sum() > len(date_series) * 0.3:  # At least 30% success
+                return parsed
+        except:
+            continue
+    
+    # Last resort: coerce
+    return pd.to_datetime(date_series, errors='coerce', dayfirst=True)
 
 def calculate_stats(df, source_name):
     """Calculate boxes and weight stats for a dataframe"""
     total_boxes = 0
     total_weight = 0.0
     
-    # Box columns
-    box_aliases = ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "no. of boxes", "boxcount", "total_boxes"]
-    # Weight columns
-    weight_aliases = ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight", "order's net weight (kg)", "weight_kg", "total_weight", "net_weight", "gross_weight", "wt", "wt (kg)"]
+    box_aliases = ["box_count", "boxes", "box count", "no of boxes", "n.o of boxes", "no. of boxes", "boxcount", "total_boxes", "box"]
+    weight_aliases = ["weight_kgs", "weight (kg)", "weight", "order net weight", "chargeable weight", "order's net weight (kg)", "weight_kg", "total_weight", "net_weight", "gross_weight", "wt", "wt (kg)", "net weight"]
     
     # Find box column
     box_col = None
@@ -491,7 +489,6 @@ def calculate_stats(df, source_name):
         if weight_col:
             break
     
-    # Calculate totals
     if box_col:
         try:
             total_boxes = pd.to_numeric(df[box_col], errors='coerce').sum()
@@ -611,7 +608,6 @@ def render_sidebar():
         st.markdown("### 🚀 Navigation")
         st.markdown("")
         
-        # Navigation options
         nav_options = [
             ("🔍 Global Search", "global_search"),
             ("🟠 ECL QC Center", "ECL QC Center"),
@@ -622,11 +618,9 @@ def render_sidebar():
             ("🟢 Kerry", "Kerry"),
         ]
         
-        # Initialize session state for page
         if "current_page" not in st.session_state:
             st.session_state.current_page = "global_search"
         
-        # Render navigation buttons
         for label, page_key in nav_options:
             is_active = st.session_state.current_page == page_key
             if st.button(
@@ -755,45 +749,89 @@ def data_page(source_name):
         return
     
     # =========================================================================
-    # DATE FILTER
+    # FIND DATE COLUMN AUTOMATICALLY
+    # =========================================================================
+    date_col = find_date_column(df)
+    
+    # =========================================================================
+    # DATE FILTER SECTION
     # =========================================================================
     st.markdown("### 📅 Date Filter")
     
-    date_col = find_date_column(df, config.get("date_col", []))
+    if date_col:
+        st.info(f"📅 Date column detected: **{date_col}**")
+        
+        # Parse dates
+        df["_parsed_date"] = smart_parse_date(df[date_col])
+        valid_dates = df["_parsed_date"].dropna()
+        
+        if len(valid_dates) > 0:
+            min_date = valid_dates.min().date()
+            max_date = valid_dates.max().date()
+            
+            col1, col2, col3 = st.columns([2, 2, 2])
+            
+            with col1:
+                start_date = st.date_input(
+                    "From Date",
+                    value=max(min_date, datetime.now().date() - timedelta(days=30)),
+                    min_value=min_date,
+                    max_value=max_date,
+                    key=f"start_date_{source_name}"
+                )
+            
+            with col2:
+                end_date = st.date_input(
+                    "To Date",
+                    value=max_date,
+                    min_value=min_date,
+                    max_value=max_date,
+                    key=f"end_date_{source_name}"
+                )
+            
+            with col3:
+                st.markdown("<br>", unsafe_allow_html=True)
+                apply_filter = st.button("🔍 Apply Date Filter", key=f"apply_filter_{source_name}", use_container_width=True)
+                clear_filter = st.button("❌ Clear Filter", key=f"clear_filter_{source_name}", use_container_width=True)
+            
+            # Store filter state
+            filter_key = f"date_filter_active_{source_name}"
+            if apply_filter:
+                st.session_state[filter_key] = True
+                st.session_state[f"start_{source_name}"] = start_date
+                st.session_state[f"end_{source_name}"] = end_date
+            
+            if clear_filter:
+                st.session_state[filter_key] = False
+            
+            # Apply filter if active
+            display_df = df.copy()
+            if st.session_state.get(filter_key, False):
+                stored_start = st.session_state.get(f"start_{source_name}", start_date)
+                stored_end = st.session_state.get(f"end_{source_name}", end_date)
+                
+                # Convert to datetime for comparison
+                start_datetime = pd.Timestamp(stored_start)
+                end_datetime = pd.Timestamp(stored_end) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
+                
+                mask = (display_df["_parsed_date"] >= start_datetime) & (display_df["_parsed_date"] <= end_datetime)
+                display_df = display_df[mask]
+                
+                st.success(f"✅ Filter Applied: {stored_start} to {stored_end} | Showing {len(display_df):,} of {len(df):,} rows")
+            
+            # Remove temp column for display
+            if "_parsed_date" in display_df.columns:
+                display_df = display_df.drop(columns=["_parsed_date"])
+        else:
+            st.warning("⚠️ Could not parse dates from the date column")
+            display_df = df.copy()
+    else:
+        st.warning("⚠️ No date column found. Available columns: " + ", ".join(df.columns[:10].tolist()))
+        display_df = df.copy()
     
-    col1, col2, col3 = st.columns([2, 2, 1])
-    
-    with col1:
-        start_date = st.date_input(
-            "From Date",
-            value=datetime.now().date() - timedelta(days=30),
-            key=f"start_date_{source_name}"
-        )
-    
-    with col2:
-        end_date = st.date_input(
-            "To Date",
-            value=datetime.now().date(),
-            key=f"end_date_{source_name}"
-        )
-    
-    with col3:
-        st.markdown("<br>", unsafe_allow_html=True)
-        apply_filter = st.checkbox("Apply Filter", key=f"apply_filter_{source_name}")
-    
-    # Filter dataframe by date
-    display_df = df.copy()
-    
-    if apply_filter and date_col:
-        try:
-            display_df["_parsed_date"] = display_df[date_col].apply(parse_date)
-            display_df = display_df[
-                (display_df["_parsed_date"] >= start_date) & 
-                (display_df["_parsed_date"] <= end_date)
-            ]
-            display_df = display_df.drop(columns=["_parsed_date"])
-        except Exception as e:
-            st.warning(f"Date filter error: {e}")
+    # Remove _parsed_date from original df display
+    if "_parsed_date" in df.columns:
+        df = df.drop(columns=["_parsed_date"])
     
     st.markdown("---")
     
@@ -838,10 +876,8 @@ def data_page(source_name):
         mask = display_df.astype(str).apply(lambda x: x.str.contains(filter_text, case=False, na=False)).any(axis=1)
         display_df = display_df[mask]
     
-    # Show dataframe
     st.dataframe(display_df, use_container_width=True, height=400)
     
-    # Download button
     st.download_button(
         "📥 Download CSV", 
         display_df.to_csv(index=False), 
